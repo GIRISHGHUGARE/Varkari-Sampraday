@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const generateToken = require('../utils/generateToken');  // Import the generateToken utility
+const generateToken = require('../utils/generateToken');
 const { sendVerificationEmail } = require('../services/emailService');
 
 const cookieOptions = {
@@ -198,7 +198,6 @@ const verifyUser = async (req, res) => {
     try {
         const userId = req.user;  // The user id is decoded from the token in the middleware
         const user = await User.findById(userId);  // Find the full user data in the database
-        console.log("Verified User ID :", userId)
         if (!user) {
             return res.status(404).json({
                 success: false,

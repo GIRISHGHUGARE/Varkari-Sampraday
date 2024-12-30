@@ -1,24 +1,34 @@
 import React, { useState } from "react";
-import { View, Text, Alert } from "react-native";
+import { View, Text, Alert, ImageBackground, Image, ScrollView, Dimensions } from "react-native";
 import { useDispatch, useSelector } from 'react-redux';
-import { login, setLoading, setError } from "../../redux/features/auth/authSlice.js"; // Import the Redux actions
+import { login, setLoading, setError } from "../../redux/features/auth/authSlice.js";
 import InputBox from "../../components/forms/InputBox.js";
 import SubmitButton from "../../components/forms/SubmitButton";
 import axios from "axios";
-import { BlurView } from 'expo-blur'; // Import BlurView from expo-blur
+import { BlurView } from 'expo-blur';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from '@react-navigation/native';
 import * as SecureStore from 'expo-secure-store';
 
+const backgroundImage = require('../../../assets/Mauli1.png');
+const background = require('../../../assets/Background.png');
+
 const Login = () => {
     const navigation = useNavigation();
-    const dispatch = useDispatch(); // Use Redux dispatch
-    const [username, setUsername] = useState(""); // Change email to username
+    const dispatch = useDispatch();
+    const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
     // Access loading and error states from Redux store
     const loading = useSelector((state) => state.auth.loading);
     const error = useSelector((state) => state.auth.error);
+
+    // Get the screen height
+    const { height } = Dimensions.get('window');
+
+    // Calculate the image height (3 parts of the screen height, 7 parts for other content)
+    const imageHeight = height * 0.3;  // 30% of the screen height
+    const contentHeight = height * 0.7; // The remaining 70% for the content
 
     // Handle username/password login
     const handleSubmit = async () => {
@@ -26,60 +36,102 @@ const Login = () => {
         dispatch(setError(null)); // Clear any previous errors
 
         try {
-            if (!username || !password) { // Check for username instead of email
+            if (!username || !password) {
                 Alert.alert("Validation Error", "Please fill in all fields.");
                 return;
             }
-            const { data } = await axios.post("http://192.168.0.114:8080/api/v1/auth/login", { username, password }); // Use username in the request
-            await SecureStore.setItemAsync('authToken', data.token); // Save token in SecureStore
-            dispatch(login(data.user)); // Dispatch the action to update Redux store
+            const { data } = await axios.post("http://192.168.0.114:8080/api/v1/auth/login", { username, password });
+            await SecureStore.setItemAsync('authToken', data.token);
+            dispatch(login(data.user));
             Alert.alert("Success", data.message);
-            navigation.navigate('Home'); // Navigate to Home after successful login
+            navigation.navigate('Home');
         } catch (error) {
-            dispatch(setError(error.response?.data?.message || "Login failed")); // Set error in Redux store
+            dispatch(setError(error.response?.data?.message || "Login failed"));
             Alert.alert("Login Failed", error.response?.data?.message || "Login failed");
         } finally {
-            dispatch(setLoading(false)); // Set loading to false
+            dispatch(setLoading(false));
         }
     };
 
     return (
-        <SafeAreaView className="flex-1 justify-center items-center bg-black p-4">
-            <BlurView
-                className="w-full max-w-md rounded-lg p-6"
-                intensity={150} // Adjust the intensity of the blur effect
-                style={{ borderRadius: 10 }} // Ensure the blur view has rounded corners
-            >
-                <Text className="text-2xl font-bold text-center mb-6">Login</Text>
+        <SafeAreaView style={{ flex: 1 }}>
+            <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                <View style={{ flex: 1 }}>
+                    <Image
+                        source={backgroundImage}
+                        style={{
+                            width: '100%',
+                            height: imageHeight,  // Dynamically set height based on 3:7 ratio
+                        }}
+                    />
+                    {/* ImageBackground with content */}
+                    <ImageBackground
+                        source={background}
+                        style={{
+                            width: '100%',
+                            height: "100%",  // Ensure it fills the remaining content space
+                            borderRadius: 20,
+                            backgroundColor: "black", // Make sure it doesn't create extra white space
+                            overflow: "hidden", // Prevent any overflow
+                            marginTop: -30
+                        }}
+                    >
+                        {/* BlurView with slight overlap */}
+                        <BlurView
+                            className="p-8"
+                            intensity={10}
+                            style={{
+                                flex: 1,
+                                overflow: "hidden",
+                                borderRadius: 20,
+                                marginTop: -30, // Apply negative margin to overlap the background
+                                marginBottom: 0, // Ensure the BlurView's bottom is flush with the content
+                            }}
+                        >
+                            <Image
+                                source={require('../../../assets/icon.png')}
+                                style={{
+                                    width: 100,
+                                    height: 100,
+                                    alignSelf: "center",
+                                    marginTop: 20
+                                }}
+                            />
+                            {/* <Text className="color-white text-center text-4xl mt-10 font-bold font-poppins">Jai Hari Mauli !</Text> */}
+                            <View className="mt-4">
+                                <InputBox
+                                    inputTitle="Username"
+                                    value={username}
+                                    setValue={setUsername}
+                                    iconStart="user"
+                                />
+                                <InputBox
+                                    inputTitle="Password"
+                                    secureTextEntry={true}
+                                    value={password}
+                                    setValue={setPassword}
+                                    iconStart="key"
+                                    iconEnd="eye-slash"
+                                />
 
-                <InputBox
-                    inputTitle="USERNAME" // Change input title to "USERNAME"
-                    value={username} // Use username state
-                    setValue={setUsername} // Set username state
-                    iconStart="user" // You can change the icon if needed
-                />
-                <InputBox
-                    inputTitle="PASSWORD"
-                    secureTextEntry={true}
-                    value={password}
-                    setValue={setPassword}
-                    iconStart="lock"
-                    iconEnd="eye-slash"
-                />
+                                <Text className="color-[#A4A4A4] text-center mt-4 mb-4 font-poppins">
+                                    Don't have an account?{" "}
+                                    <Text className="text-red-500 font-bold font-poppins" onPress={() => navigation.navigate('Register')}>
+                                        Register Now
+                                    </Text>
+                                </Text>
 
-                <Text className="text-black text-center mt-4 mb-4">
-                    Don't have an account?{" "}
-                    <Text className="text-red-600 font-bold" onPress={() => navigation.navigate('Register')}>
-                        Register Now
-                    </Text>
-                </Text>
+                                <SubmitButton
+                                    btnTitle="Login"
+                                    loading={loading}
+                                    handleSubmit={handleSubmit}
+                                />
+                            </View>
 
-                <SubmitButton
-                    btnTitle="Login"
-                    loading={loading} // Use loading from Redux store
-                    handleSubmit={handleSubmit}
-                />
-            </BlurView>
+                        </BlurView>
+                    </ImageBackground>
+                </View>
+            </ScrollView>
         </SafeAreaView>
     );
 };
