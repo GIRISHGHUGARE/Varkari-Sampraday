@@ -179,9 +179,12 @@ const loginUser = async (req, res) => {
         // Send the response with a success message and the user (without password)
         return res.status(200).json({
             message: 'Login successful',
+            token: token,
             user: {
-                ...user._doc,
-                password: undefined,  // Don't send the password in the response
+                _id: user._id,
+                username: user.username,
+                email: user.email,
+                isVerified: user.isVerified
             }
         });
     } catch (error) {
@@ -190,6 +193,37 @@ const loginUser = async (req, res) => {
     }
 };
 
+// VERIFY USER (PROTECTED ROUTE)
+const verifyUser = async (req, res) => {
+    try {
+        const userId = req.user;  // The user id is decoded from the token in the middleware
+        const user = await User.findById(userId);  // Find the full user data in the database
+        console.log("Verified User ID :", userId)
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found",
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "User is authenticated",
+            user: {
+                _id: user._id,
+                username: user.username,
+                email: user.email,
+                isVerified: user.isVerified,
+            },
+        });
+    } catch (error) {
+        console.error("Error in verifying user", error);
+        return res.status(500).json({
+            success: false,
+            message: "Server error",
+        });
+    }
+};
 //LOGOUT FUNCTION
 const logout = async (req, res) => {
     res.clearCookie("token");
@@ -199,4 +233,4 @@ const logout = async (req, res) => {
     })
 };
 
-module.exports = { registerUser, verifyEmail, resendVerificationEmail, loginUser, logout };
+module.exports = { registerUser, verifyEmail, resendVerificationEmail, loginUser, verifyUser, logout };

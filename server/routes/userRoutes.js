@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const { registerUser, verifyEmail, logout, loginUser, resendVerificationEmail } = require('../controllers/userController');
+const { registerUser, verifyEmail, logout, loginUser, resendVerificationEmail, verifyUser } = require('../controllers/userController');
 const userValidationRules = require('../validations/userValidation');
 const { validationResult } = require('express-validator');
 const loginValidationRules = require('../validations/loginValidation');
+const authenticate = require('../middlewares/authMiddleware');
 
 // MIDDLEWARE TO HANDLE ERRORS
 const validate = (req, res, next) => {
@@ -19,6 +20,7 @@ router.post('/register', userValidationRules, validate, registerUser);
 router.post("/verify-email", verifyEmail);
 router.post("/resend-otp", resendVerificationEmail);
 router.post('/login', loginValidationRules, validate, loginUser);
+router.get('/verify-user', authenticate, verifyUser);
 router.delete("/logout", logout);
 
 module.exports = router;

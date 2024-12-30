@@ -17,10 +17,16 @@ connectDB();
 const app = express();
 
 //MIDDLEWARES
-app.use(cors());
+const corsOptions = {
+    origin: 'http://192.168.0.114:8081',
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Authorization', 'Content-Type'],
+};
+app.use(cors(corsOptions));
 app.use(cookieParser()); //TO PARSE COOKIE
 app.use(express.json());
 app.use(morgan("dev"));
+
 
 //ROUTES
 app.get("", (req, res) => {
