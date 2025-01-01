@@ -1,16 +1,21 @@
+// PACKAGES
 const mongoose = require('mongoose');
-const User = require('./User');  // Regular User model
 
-// Define the Admin schema (can extend the User model)
+// FILES
+const User = require('./User');
+
+// SCHEMA DEFINITION (EXTENDED BY USER MODEL)
 const adminSchema = new mongoose.Schema({
     permissions: {
-        type: [String], // Array of permissions for the admin (e.g., ['manage-users', 'view-reports'])
-        default: ['manage-users'], // Default permission for admins
+        type: [String], // ARRAY OF PERMISSIONS FOR ADMIN (e.g., ['manage-users', 'view-reports'])
+        default: ['manage-users'], // DEFAULT PERMISSION
     },
 }, {
     timestamps: true,
 });
 
-// Create and export the Admin model that extends User
+// CREATE ADMIN MODEL THAT EXTENDS USER MODEL
 const Admin = User.discriminator('Admin', adminSchema);
+
+// EXPORT ADMIN MODEL
 module.exports = Admin;

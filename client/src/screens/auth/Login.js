@@ -10,9 +10,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from '@react-navigation/native';
 import * as SecureStore from 'expo-secure-store';
 
-const backgroundImage = require('../../../assets/Mauli1.png');
-const background = require('../../../assets/Background.png');
-
 const Login = () => {
     const navigation = useNavigation();
     const dispatch = useDispatch();
@@ -22,6 +19,9 @@ const Login = () => {
     // Access loading and error states from Redux store
     const loading = useSelector((state) => state.auth.loading);
     const error = useSelector((state) => state.auth.error);
+
+    //
+    const isVerified = useSelector((state) => state.auth.user.isVerified);
 
     // Get the screen height
     const { height } = Dimensions.get('window');
@@ -58,7 +58,7 @@ const Login = () => {
             <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
                 <View style={{ flex: 1 }}>
                     <Image
-                        source={backgroundImage}
+                        source={require('../../../assets/Mauli1.png')}
                         style={{
                             width: '100%',
                             height: imageHeight,  // Dynamically set height based on 3:7 ratio
@@ -66,7 +66,7 @@ const Login = () => {
                     />
                     {/* ImageBackground with content */}
                     <ImageBackground
-                        source={background}
+                        source={require('../../../assets/Background.png')}
                         style={{
                             width: '100%',
                             height: "100%",  // Ensure it fills the remaining content space
@@ -116,7 +116,7 @@ const Login = () => {
 
                                 <Text className="color-[#A4A4A4] text-center mt-4 mb-4 font-poppins">
                                     Don't have an account?{" "}
-                                    <Text className="text-red-500 font-bold font-poppins" onPress={() => navigation.navigate('Register')}>
+                                    <Text className="text-red-500 font-bold font-poppins" onPress={() => navigation.navigate('SignUp')}>
                                         Register Now
                                     </Text>
                                 </Text>

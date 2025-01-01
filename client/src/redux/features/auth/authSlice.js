@@ -51,6 +51,7 @@ export const { login, logout, setLoading, setError } = authSlice.actions;
 // Selectors
 export const selectAuth = (state) => state.auth; // Ensure this matches the key in the store
 export const selectUser = (state) => state.auth.user.username;
+export const selectUserEmail = (state) => state.auth.user.email;
 export const selectIsVerified = (state) => state.auth.user.isVerified;
 
 export default authSlice.reducer;

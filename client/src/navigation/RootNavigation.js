@@ -17,6 +17,7 @@ import Product from "../screens/tabs/Product.js";
 import Profile from "../screens/tabs/Profile.js";
 import Login from "../screens/auth/Login.js";
 import SignUp from "../screens/auth/SignUp.js";
+import OtpScreen from '../screens/auth/OtpScreen.js';
 
 
 const Stack = createNativeStackNavigator();
@@ -67,7 +68,12 @@ const RootNavigation = () => {
     const username = useSelector(selectUser);
     const isVerified = useSelector(selectIsVerified);
     const authenticatedUser = username && isVerified;
-
+    if (username) {
+        if (isVerified) {
+            navigation.navigate("Login")
+        }
+        navigation.navigate('OtpScreen');
+    }
     // Navigate based on authentication status
     return (
         <Stack.Navigator initialRouteName={authenticatedUser ? "Home" : "Login"}>
@@ -92,6 +98,16 @@ const RootNavigation = () => {
                     <Stack.Screen
                         name="SignUp"
                         component={SignUp}
+                        options={{
+                            headerShown: false,
+                            title: "Sign Up",
+                            headerStyle: { backgroundColor: '#812F21' },
+                            headerTitleAlign: 'center',
+                        }}
+                    />
+                    <Stack.Screen
+                        name="OtpScreen"
+                        component={OtpScreen}
                         options={{
                             headerShown: false,
                             title: "Sign Up",

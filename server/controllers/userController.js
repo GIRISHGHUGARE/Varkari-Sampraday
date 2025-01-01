@@ -1,17 +1,23 @@
-const User = require('../models/User');
+// PACKAGES
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+
+// FILES
+const User = require('../models/User');
 const generateToken = require('../utils/generateToken');
 const { sendVerificationEmail } = require('../services/emailService');
 
+// HANDLING COOKIE FUNCTION
 const cookieOptions = {
     httpOnly: true,   // Prevents JavaScript access
     secure: process.env.NODE_ENV === 'production', // Ensure the cookie is only sent over HTTPS in production
     maxAge: 3600000, // 1 hour
     sameSite: 'Strict',  // Adjust based on your cross-origin requirements
 };
-const RESEND_OTP_LIMIT = 3;  // Limit on how many times OTP can be resent
-const OTP_EXPIRATION_TIME = 24 * 60 * 60 * 1000;  // OTP expiration time (24 hours)
+
+// VARIABLES
+const RESEND_OTP_LIMIT = 3;  // LIMIT ON HOW MANY OTP CAN BE RESENT
+const OTP_EXPIRATION_TIME = 24 * 60 * 60 * 1000;  // OTP EXPIRATION TIME (24 HOURS)
 
 // REGISTER FUNCTION
 const registerUser = async (req, res) => {
@@ -27,7 +33,7 @@ const registerUser = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
 
         // Generate a verification token
-        const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
+        const verificationToken = Math.floor(1000 + Math.random() * 9000).toString();
 
         // Create the user
         const user = new User({
@@ -52,9 +58,12 @@ const registerUser = async (req, res) => {
         // Send response without the token
         res.status(201).json({
             message: 'User registered successfully',
+            token: token,
             user: {
-                ...user._doc,
-                password: undefined,
+                _id: user._id,
+                username: user.username,
+                email: user.email,
+                isVerified: user.isVerified
             }
         });
     } catch (err) {
@@ -62,19 +71,32 @@ const registerUser = async (req, res) => {
     }
 };
 
+// EMAIL VERIFICATION FUNCTION
 const verifyEmail = async (req, res) => {
-    const { code } = req.body;
     try {
-        const user = await User.findOne({
-            verificationToken: code,
-            verificationTokenExpiresAt: { $gt: Date.now() }
-        })
+        const { otp } = req.body;
+        const userId = req.user;
+        // Fetch user from database
+        const user = await User.findById(userId);
+        console.log("User  Details", user);
         if (!user) {
+            return res.status(404).json({ message: "User  not found" });
+        }
+
+        // If the user is already verified, don't resend OTP
+        if (user.isVerified) {
+            return res.status(400).json({ message: "User  already verified" });
+        }
+
+        console.log(user.verificationToken);
+        console.log(otp);
+        if (user.verificationToken !== otp || user.verificationTokenExpiresAt < Date.now()) {
             return res.status(400).json({
                 success: false,
-                message: "Invalid or expired verification code"
-            })
+                message: "Invalid or expired verification OTP"
+            });
         }
+
         user.isVerified = true;
         user.verificationToken = undefined;
         user.verificationTokenExpiresAt = undefined;
@@ -82,28 +104,20 @@ const verifyEmail = async (req, res) => {
         return res.status(200).json({
             success: true,
             message: "Email verified successfully"
-        })
+        });
     } catch (error) {
-        console.log("Error in verifying email", error);
+        console.log("Error in verifying email", error.response?.data || error.message);
         return res.status(500).json({
             success: false,
             message: "Internal server error"
-        })
+        });
     }
 };
 
+// RESEND EMAIL VERIFICATION OTP FUNCTION
 const resendVerificationEmail = async (req, res) => {
     try {
-        // Extract the user ID from the JWT token in the header (assuming the token is sent in the request header)
-        const token = req.cookies.token || req.header('Authorization')?.replace('Bearer ', '');
-        if (!token) {
-            return res.status(401).json({ message: "Authorization token missing" });
-        }
-
-        // Decode the JWT token to get user ID
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const userId = decoded.user._id;
-
+        const userId = req.user;
         // Fetch user from database
         const user = await User.findById(userId);
 
@@ -152,31 +166,28 @@ const resendVerificationEmail = async (req, res) => {
     }
 };
 
-
 // LOGIN FUNCTION
 const loginUser = async (req, res) => {
     const { username, password } = req.body;
 
     try {
-        // Find the user by username (or email, depending on your authentication method)
         const user = await User.findOne({ username });
         if (!user) {
             return res.status(400).json({ message: 'Invalid username or password' });
         }
 
-        // Compare the provided password with the stored hashed password
+        // COMPARE PASSWORDS
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(400).json({ message: 'Invalid username or password' });
         }
 
-        // Generate a JWT token
+        // GENERATE A JWT TOKEN
         const token = generateToken(user._id);
 
-        // Set token in HttpOnly cookie (optional, or you could return it in response)
-        res.cookie('token', token, { httpOnly: true, maxAge: 3600000 });  // 1 hour expiration
+        // SET TOKEN IN HttpOnly cookie
+        res.cookie('token', token, { httpOnly: true, maxAge: 3600000 });  // 1 HOUR EXPIRATION
 
-        // Send the response with a success message and the user (without password)
         return res.status(200).json({
             message: 'Login successful',
             token: token,
@@ -196,8 +207,8 @@ const loginUser = async (req, res) => {
 // VERIFY USER (PROTECTED ROUTE)
 const verifyUser = async (req, res) => {
     try {
-        const userId = req.user;  // The user id is decoded from the token in the middleware
-        const user = await User.findById(userId);  // Find the full user data in the database
+        const userId = req.user;  // DECODED userId WHICH IS PASSED FROM AUTHENTICATE MIDDLEWARE
+        const user = await User.findById(userId);  // FIND EVERYTHING RELATED TO USER
         if (!user) {
             return res.status(404).json({
                 success: false,
@@ -223,6 +234,7 @@ const verifyUser = async (req, res) => {
         });
     }
 };
+
 //LOGOUT FUNCTION
 const logout = async (req, res) => {
     res.clearCookie("token");

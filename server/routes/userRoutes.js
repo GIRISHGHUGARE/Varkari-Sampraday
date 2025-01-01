@@ -1,10 +1,14 @@
+// PACKAGES
 const express = require('express');
-const router = express.Router();
+const { validationResult } = require('express-validator');
+
+// FILES
 const { registerUser, verifyEmail, logout, loginUser, resendVerificationEmail, verifyUser } = require('../controllers/userController');
 const userValidationRules = require('../validations/userValidation');
-const { validationResult } = require('express-validator');
 const loginValidationRules = require('../validations/loginValidation');
 const authenticate = require('../middlewares/authMiddleware');
+
+const router = express.Router();
 
 // MIDDLEWARE TO HANDLE ERRORS
 const validate = (req, res, next) => {
@@ -17,8 +21,8 @@ const validate = (req, res, next) => {
 
 // ROUTES
 router.post('/register', userValidationRules, validate, registerUser);
-router.post("/verify-email", verifyEmail);
-router.post("/resend-otp", resendVerificationEmail);
+router.post("/verify-email", authenticate, verifyEmail);
+router.post("/resend-otp", authenticate, resendVerificationEmail);
 router.post('/login', loginValidationRules, validate, loginUser);
 router.get('/verify-user', authenticate, verifyUser);
 router.delete("/logout", logout);
