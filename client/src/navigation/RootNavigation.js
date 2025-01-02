@@ -9,7 +9,7 @@ import axios from 'axios';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { useNavigation } from '@react-navigation/native';
 
-// Import your screens
+// File imports
 import Home from "../screens/tabs/Home.js";
 import Tracker from "../screens/tabs/Tracker.js";
 import Post from "../screens/tabs/Post.js";
@@ -18,6 +18,7 @@ import Profile from "../screens/tabs/Profile.js";
 import Login from "../screens/auth/Login.js";
 import SignUp from "../screens/auth/SignUp.js";
 import OtpScreen from '../screens/auth/OtpScreen.js';
+import client from '../lib/axios.js';
 
 
 const Stack = createNativeStackNavigator();
@@ -25,18 +26,22 @@ const Stack = createNativeStackNavigator();
 const RootNavigation = () => {
     const dispatch = useDispatch();
     const navigation = useNavigation();
+    const username = useSelector(selectUser);
+    const isVerified = useSelector(selectIsVerified);
+    const authenticatedUser = username && isVerified;
+
     const handleLogout = async () => {
         try {
             dispatch(login(""));
             await SecureStore.deleteItemAsync('authToken');
-            const data = await axios.delete('http://192.168.0.114:8080/api/v1/auth/logout');
+            const data = await client.delete('/auth/logout');
             Alert.alert("Success", data.message);
             navigation.navigate('Login');
         } catch (error) {
-            console.error("Error error in logout", error);
+            console.error("Error in logout", error);
         }
-
     };
+
     // Fetch token and authenticate user on app load
     useEffect(() => {
         const checkAuth = async () => {
@@ -44,7 +49,7 @@ const RootNavigation = () => {
             if (token) {
                 try {
                     dispatch(setLoading(true));
-                    const response = await axios.get('http://192.168.0.114:8080/api/v1/auth/verify-user', {
+                    const response = await client.get('/auth/verify-user', {
                         headers: { Authorization: `Bearer ${token}` },
                     });
                     if (response.data.success && response.data.user) {
@@ -65,16 +70,19 @@ const RootNavigation = () => {
         checkAuth();
     }, [dispatch]);
 
-    const username = useSelector(selectUser);
-    const isVerified = useSelector(selectIsVerified);
-    const authenticatedUser = username && isVerified;
-    if (username) {
-        if (isVerified) {
-            navigation.navigate("Login")
-        }
-        navigation.navigate('OtpScreen');
-    }
     // Navigate based on authentication status
+    useEffect(() => {
+        if (username) {
+            if (isVerified) {
+                navigation.navigate("Home");
+            } else {
+                navigation.navigate('OtpScreen');
+            }
+        } else {
+            navigation.navigate('Login');
+        }
+    }, [username, isVerified, navigation]);
+
     return (
         <Stack.Navigator initialRouteName={authenticatedUser ? "Home" : "Login"}>
             {authenticatedUser ? (

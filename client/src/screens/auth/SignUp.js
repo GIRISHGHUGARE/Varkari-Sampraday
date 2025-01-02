@@ -9,6 +9,7 @@ import { BlurView } from 'expo-blur';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from '@react-navigation/native';
 import * as SecureStore from 'expo-secure-store';
+import client from "../../lib/axios.js";
 
 const SignUp = () => {
     const navigation = useNavigation();
@@ -37,7 +38,7 @@ const SignUp = () => {
                 Alert.alert("Validation Error", "Please fill in all fields.");
                 return;
             }
-            const { data } = await axios.post("http://192.168.0.114:8080/api/v1/auth/register", { username, email, password });
+            const { data } = await client.post("/auth/register", { username, email, password });
             await SecureStore.setItemAsync('authToken', data.token);
             dispatch(login(data.user));
             Alert.alert("Success", data.message);

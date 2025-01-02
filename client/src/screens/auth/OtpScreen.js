@@ -6,6 +6,7 @@ import { selectUserEmail } from "../../redux/features/auth/authSlice";
 import axios from "axios";
 import { useDispatch, useSelector } from 'react-redux';
 import * as SecureStore from 'expo-secure-store';
+import client from "../../lib/axios";
 const OtpScreen = () => {
     const email = useSelector(selectUserEmail);
     const [otp, setOtp] = useState(["", "", "", ""]); // State to store OTP digits
@@ -63,7 +64,7 @@ const OtpScreen = () => {
         try {
             const token = await SecureStore.getItemAsync('authToken');
             // Replace with actual API call for OTP verification
-            const response = await axios.post("http://192.168.0.114:8080/api/v1/auth/verify-email",
+            const response = await client.post("/auth/verify-email",
                 { otp: otpString }, // Data payload
                 { headers: { Authorization: `Bearer ${token}` } } // Headers
             );
@@ -80,6 +81,27 @@ const OtpScreen = () => {
         }
     };
 
+    // Handle OTP verification
+    const handleResendOtp = async () => {
+        setLoading(true);
+        try {
+            const token = await SecureStore.getItemAsync('authToken');
+            // Replace with actual API call for OTP verification
+            const response = await client.post("/auth/resend-otp",
+                { headers: { Authorization: `Bearer ${token}` } } // Headers
+            );
+            console.log("Response:", response)
+            if (response.data.success) {
+                Alert.alert("Success", "Otp resend successful!");
+            } else {
+                Alert.alert("Error", "Please try again.");
+            }
+        } catch (error) {
+            Alert.alert("Error", error.response?.data?.message || "An error occurred. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    };
     // Focus on the first input when the component mounts
     useEffect(() => {
         inputRefs.current[0].focus();
@@ -114,8 +136,8 @@ const OtpScreen = () => {
                 handleSubmit={handleVerifyOtp}
             />
 
-            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.resendLink}>
-                <Text style={styles.resendText}>Resend OTP</Text>
+            <TouchableOpacity onPress={handleResendOtp} style={styles.resendLink}>
+                <Text className="mt-20" style={styles.resendText}>Resend OTP</Text>
             </TouchableOpacity>
         </View>
     );

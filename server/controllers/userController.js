@@ -41,7 +41,7 @@ const registerUser = async (req, res) => {
             email,
             password: hashedPassword,
             verificationToken,
-            verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000,
+            verificationTokenExpiresAt: Date.now() + OTP_EXPIRATION_TIME,
         });
         await user.save();
 
@@ -51,21 +51,24 @@ const registerUser = async (req, res) => {
         // Set JWT token as an HttpOnly cookie
         res.cookie('token', token, cookieOptions);  // Send token as HttpOnly cookie
 
-        console.log('User email:', user.email);
         //SEND VERIFICATION EMAIL
-        await sendVerificationEmail({ email: user.email, verificationToken });
+        try {
+            await sendVerificationEmail({ email: user.email, verificationToken });
 
-        // Send response without the token
-        res.status(201).json({
-            message: 'User registered successfully',
-            token: token,
-            user: {
-                _id: user._id,
-                username: user.username,
-                email: user.email,
-                isVerified: user.isVerified
-            }
-        });
+            // Send response without the token
+            res.status(201).json({
+                message: 'User registered successfully',
+                token: token,
+                user: {
+                    _id: user._id,
+                    username: user.username,
+                    email: user.email,
+                    isVerified: user.isVerified
+                }
+            });
+        } catch (error) {
+            res.status(500).json({ error: error });
+        }
     } catch (err) {
         res.status(500).json({ error: 'Server error' });
     }
@@ -120,7 +123,6 @@ const resendVerificationEmail = async (req, res) => {
         const userId = req.user;
         // Fetch user from database
         const user = await User.findById(userId);
-
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
@@ -142,7 +144,7 @@ const resendVerificationEmail = async (req, res) => {
 
         if (isOtpExpired || resendTooSoon) {
             // Generate a new OTP
-            const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
+            const verificationToken = Math.floor(1000 + Math.random() * 9000).toString();
             const expiresAt = Date.now() + OTP_EXPIRATION_TIME; // OTP expiration time
 
             // Update the user with the new OTP, expiration time, and resend count
@@ -151,11 +153,15 @@ const resendVerificationEmail = async (req, res) => {
             user.otpResendCount += 1; // Increment resend count
             user.otpResendTimestamp = currentTime;  // Update last resend timestamp
             await user.save();
+            try {
+                // Send the new OTP via email
+                await sendVerificationEmail({ email: user.email, verificationToken });
 
-            // Send the new OTP via email
-            await sendVerificationEmail(user.email, verificationToken);
+                return res.status(200).json({ message: "New OTP sent successfully" });
+            } catch (error) {
+                return res.status(500).json({ error: error });
+            }
 
-            return res.status(200).json({ message: "New OTP sent successfully" });
         } else {
             // OTP has not expired, or user is trying to resend too soon
             return res.status(400).json({ message: "OTP has expired or you're trying to resend too soon" });
