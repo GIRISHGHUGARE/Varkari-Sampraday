@@ -35,24 +35,24 @@ const registerUser = async (req, res) => {
         // Generate a verification token
         const verificationToken = Math.floor(1000 + Math.random() * 9000).toString();
 
-        // Create the user
-        const user = new User({
-            username,
-            email,
-            password: hashedPassword,
-            verificationToken,
-            verificationTokenExpiresAt: Date.now() + OTP_EXPIRATION_TIME,
-        });
-        await user.save();
-
-        // Generate a JWT token
-        const token = generateToken(user._id);
-
-        // Set JWT token as an HttpOnly cookie
-        res.cookie('token', token, cookieOptions);  // Send token as HttpOnly cookie
-
         //SEND VERIFICATION EMAIL
         try {
+            // Create the user
+            const user = new User({
+                username,
+                email,
+                password: hashedPassword,
+                verificationToken,
+                verificationTokenExpiresAt: Date.now() + OTP_EXPIRATION_TIME,
+            });
+            await user.save();
+
+            // Generate a JWT token
+            const token = generateToken(user._id);
+
+            // Set JWT token as an HttpOnly cookie
+            res.cookie('token', token, cookieOptions);  // Send token as HttpOnly cookie
+
             await sendVerificationEmail({ email: user.email, verificationToken });
 
             // Send response without the token
@@ -67,7 +67,7 @@ const registerUser = async (req, res) => {
                 }
             });
         } catch (error) {
-            res.status(500).json({ error: error });
+            res.status(500).json({ error: "Error in sending verification email! Please try again later!" });
         }
     } catch (err) {
         res.status(500).json({ error: 'Server error' });

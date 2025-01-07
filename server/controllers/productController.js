@@ -1,59 +1,55 @@
-// FILES
-const Post = require('../models/Post');
-const User = require('../models/User');
+const Product = require("../models/Product.js");
+const User = require("../models/User.js")
 
-const getPost = async (req, res) => {
-    try {
-        const userId = req.user;  // DECODED userId WHICH IS PASSED FROM AUTHENTICATE MIDDLEWARE
-        const user = await User.findById(userId);  // FIND EVERYTHING RELATED TO USER
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: "Unauthenticated Route!",
-            });
-        }
-        const post = await Post.find();
-        return res.status(200).json({
-            success: true,
-            message: "User is authenticated post fetched successfully!",
-            post,
-        });
-    } catch (error) {
-        console.error("Error in verifying user", error);
-        return res.status(500).json({
-            success: false,
-            message: "Server error",
-        });
-    }
-}
-
-const addPost = async (req, res) => {
+const getProduct = async (req, res) => {
     try {
         const userId = req.user;
         const user = await User.findById(userId);
-        const { uploadedPhoto, caption } = req.body;
         if (!user) {
-            res.status(404).json({
-                success: false,
-                message: "Unauthenticated route!!"
-            })
-        }
-        if (!uploadedPhoto || !caption) {
             res.status(500).json({
                 success: false,
-                message: "Please enter all required fields!"
+                message: "unauthenticated route!"
+            });
+        }
+        const product = await Product.find();
+        res.status(200).json({
+            success: true,
+            message: "Product fetched successful",
+            product,
+        })
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Server error!"
+        })
+    }
+}
+
+const addProduct = async (req, res) => {
+    try {
+        const userId = req.user;
+        const user = await User.findById(userId);
+        const { name, description, price, quantity, productPhoto } = req.body;
+        if (user.isAdmin) {
+            if (!name || !description || !price || !quantity || !productPhoto) {
+                res.status(500).json({
+                    success: false,
+                    message: "Please enter all required fields!"
+                })
+            }
+            const product = new Product({
+                name,
+                description,
+                price,
+                quantity,
+                productPhoto
+            });
+            await product.save();
+            res.status(201).json({
+                success: true,
+                message: "Product created successfully!"
             })
         }
-        const post = new Post({
-            uploadedPhoto,
-            caption,
-            postedBy: userId,
-        });
-        await post.save();
-        res.status(201).json({
-            success: true,
-            message: "Post created successfully!"
-        })
     } catch (error) {
         res.status(500).json({
             success: false,
@@ -62,7 +58,7 @@ const addPost = async (req, res) => {
     }
 }
 
-const deletePost = async (req, res) => {
+const deleteProduct = async (req, res) => {
     try {
         const { id } = req.params
         const userId = req.user;
@@ -86,7 +82,7 @@ const deletePost = async (req, res) => {
     }
 }
 
-const updatePost = async (req, res) => {
+const updateProduct = async (req, res) => {
     try {
         const userId = req.user;
         const user = await User.findById(userId);
@@ -121,4 +117,5 @@ const updatePost = async (req, res) => {
         });
     }
 }
-module.exports = { addPost, getPost, deletePost, updatePost }
+
+module.exports = { getProduct, addProduct, deleteProduct, updateProduct }

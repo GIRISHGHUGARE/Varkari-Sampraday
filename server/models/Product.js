@@ -18,6 +18,10 @@ const productSchema = new mongoose.Schema({
         type: Number,
         required: true,
     },
+    productPhoto: {
+        type: String, // URL OF PROFILE PHOTO
+        default: null,
+    },
 });
 
 const Product = mongoose.model("Product", productSchema);
