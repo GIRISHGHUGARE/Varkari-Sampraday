@@ -1,7 +1,7 @@
-const Product = require("../models/Product.js");
+const Story = require("../models/Story.js");
 const User = require("../models/User.js")
 
-const getProduct = async (req, res) => {
+const getStory = async (req, res) => {
     try {
         const userId = req.user;
         const user = await User.findById(userId);
@@ -11,11 +11,11 @@ const getProduct = async (req, res) => {
                 message: "unauthenticated route!"
             });
         }
-        const product = await Product.find();
+        const story = await Story.find();
         res.status(200).json({
             success: true,
-            message: "Product fetched successful",
-            product,
+            message: "Story fetched successful",
+            story,
         })
     } catch (error) {
         res.status(500).json({
@@ -25,29 +25,26 @@ const getProduct = async (req, res) => {
     }
 }
 
-const addProduct = async (req, res) => {
+const addStory = async (req, res) => {
     try {
         const userId = req.user;
         const user = await User.findById(userId);
-        const { name, description, price, quantity, productPhoto } = req.body;
+        const { title, content } = req.body;
         if (user.isAdmin) {
-            if (!name || !description || !price || !quantity || !productPhoto) {
+            if (!title || !content) {
                 res.status(500).json({
                     success: false,
                     message: "Please enter all required fields!"
                 })
             }
-            const product = new Product({
-                name,
-                description,
-                price,
-                quantity,
-                productPhoto
+            const story = new Story({
+                title,
+                content
             });
-            await product.save();
+            await story.save();
             res.status(201).json({
                 success: true,
-                message: "Product created successfully!"
+                message: "Story created successfully!"
             })
         }
         res.status(500).json({
@@ -62,13 +59,13 @@ const addProduct = async (req, res) => {
     }
 }
 
-const deleteProduct = async (req, res) => {
+const deleteStory = async (req, res) => {
     try {
         const { id } = req.params
         const userId = req.user;
         const user = await User.findById(userId);
         if (user.isAdmin) {
-            await Product.findByIdAndDelete({ _id: id });
+            await Story.findByIdAndDelete({ _id: id });
             res.status(201).json({
                 success: true,
                 message: 'Product deleted successfully!'
@@ -86,23 +83,20 @@ const deleteProduct = async (req, res) => {
     }
 }
 
-const updateProduct = async (req, res) => {
+const updateStory = async (req, res) => {
     try {
         const userId = req.user;
         const user = await User.findById(userId);
         const { id } = req.params;
-        const { name, description, price, quantity, productPhoto } = req.body;
+        const { title, content } = req.body;
         if (user.isAdmin) {
-            const updatedProduct = await Product.findByIdAndUpdate(
+            const updatedStory = await Story.findByIdAndUpdate(
                 {
                     _id: id
                 },
                 {
-                    name: name,
-                    description: description,
-                    price: price,
-                    quantity: quantity,
-                    productPhoto: productPhoto,
+                    title: title,
+                    content: content,
                 },
                 {
                     new: true
@@ -110,7 +104,7 @@ const updateProduct = async (req, res) => {
             );
             res.status(200).json({
                 success: true,
-                message: "Product updated successfully!"
+                message: "Story updated successfully!"
             });
         }
         res.status(500).json({
@@ -125,4 +119,4 @@ const updateProduct = async (req, res) => {
     }
 }
 
-module.exports = { getProduct, addProduct, deleteProduct, updateProduct }
+module.exports = { getStory, addStory, deleteStory, updateStory }
