@@ -6,6 +6,7 @@ const initialState = {
         _id: null,
         username: null,
         email: null,
+        summary: null,
         isVerified: null,
     },
     loading: false,
@@ -21,6 +22,7 @@ export const authSlice = createSlice({
             state.user._id = action.payload._id; // Assuming payload contains _id
             state.user.username = action.payload.username; // Assuming payload contains username
             state.user.email = action.payload.email; // Assuming payload contains email
+            state.user.summary = action.payload.summary;
             state.user.isVerified = action.payload.isVerified; // Assuming payload contains isVerified
             state.loading = false;
             state.error = null;
@@ -52,6 +54,7 @@ export const { login, logout, setLoading, setError } = authSlice.actions;
 export const selectAuth = (state) => state.auth; // Ensure this matches the key in the store
 export const selectUser = (state) => state.auth.user.username;
 export const selectUserEmail = (state) => state.auth.user.email;
+export const selectUserSummary = (state) => state.auth.user.summary;
 export const selectIsVerified = (state) => state.auth.user.isVerified;
 
 export default authSlice.reducer;

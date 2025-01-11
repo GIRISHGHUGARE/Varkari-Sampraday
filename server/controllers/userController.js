@@ -201,6 +201,7 @@ const loginUser = async (req, res) => {
                 _id: user._id,
                 username: user.username,
                 email: user.email,
+                summary: user.summary,
                 isVerified: user.isVerified
             }
         });
@@ -250,4 +251,45 @@ const logout = async (req, res) => {
     })
 };
 
-module.exports = { registerUser, verifyEmail, resendVerificationEmail, loginUser, verifyUser, logout };
+const updateUser = async (req, res) => {
+    try {
+        const userId = req.user;  // DECODED userId WHICH IS PASSED FROM AUTHENTICATE MIDDLEWARE
+        const user = await User.findById(userId);  // FIND EVERYTHING RELATED TO USER
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found",
+            });
+        }
+        const { username, summary } = req.body;
+        const updatedUser = await User.findOneAndUpdate(user._id, {
+            username: username,
+            summary: summary
+        }, { new: true });
+        try {
+            const user = await User.findById(userId);
+            return res.status(200).send({
+                success: true,
+                message: "Profile updated",
+                user: {
+                    _id: user._id,
+                    username: user.username,
+                    email: user.email,
+                    isVerified: user.isVerified,
+                    summary: user.summary
+                }
+            })
+        } catch (error) {
+
+        }
+    } catch (error) {
+        console.log(error);
+        return res.status(500).send({
+            success: false,
+            message: "error in update api"
+        })
+    }
+}
+
+
+module.exports = { registerUser, verifyEmail, resendVerificationEmail, loginUser, verifyUser, updateUser, logout };

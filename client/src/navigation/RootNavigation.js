@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
-import { View, TouchableOpacity, Alert, TextInput } from 'react-native';
+import { View, TouchableOpacity, Alert, TextInput, StyleSheet, Text } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createDrawerNavigator } from '@react-navigation/drawer';
+import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
 import { useSelector, useDispatch } from 'react-redux';
 import * as SecureStore from 'expo-secure-store';
 import { login, setLoading, setError } from '../redux/features/auth/authSlice.js';
@@ -23,13 +23,50 @@ import OtpScreen from '../screens/auth/OtpScreen.js';
 import client from '../lib/axios.js';
 import Story from '../screens/tabs/Story.js';
 
-
+// Create navigators
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
 
+// Access navigation from props
+const CustomDrawerContent = (props) => {
+    const { navigation } = props;
+    const dispatch = useDispatch();
+
+    const handleLogout = async () => {
+        try {
+            dispatch(login("")); // Clear login state
+            await SecureStore.deleteItemAsync("authToken");
+            const data = await client.delete("/auth/logout");
+            Alert.alert("Success", data.message);
+            navigation.navigate("Login");
+        } catch (error) {
+            console.error("Error in logout", error);
+            Alert.alert("Error", "Failed to logout");
+        }
+    };
+
+    return (
+        <View style={{ flex: 1 }}>
+            {/* Scrollable list of drawer items */}
+            <DrawerContentScrollView {...props}>
+                <DrawerItemList {...props} />
+            </DrawerContentScrollView>
+
+            {/* Logout Button at the Bottom */}
+            <TouchableOpacity
+                style={styles.logoutButton}
+                onPress={handleLogout}
+            >
+                <MaterialIcons name="logout" size={24} color="black" />
+                <Text style={styles.logoutText}>Logout</Text>
+            </TouchableOpacity>
+        </View>
+    );
+};
 const DrawerNavigation = () => {
     return (
         <Drawer.Navigator
+            drawerContent={(props) => <CustomDrawerContent {...props} />}
             screenOptions={({ navigation }) => ({
                 headerLeft: () => (
                     <TouchableOpacity
@@ -39,36 +76,206 @@ const DrawerNavigation = () => {
                         <FontAwesome5 name="user-circle" size={24} color="black" />
                     </TouchableOpacity>
                 ),
-                headerTitle: () => (
-                    <View style={{ flexDirection: 'row', justifyContent: "center", alignItems: 'center', marginLeft: 10 }}>
-                        <TextInput
-                            placeholder="Search..."
-                            style={{
-                                height: 40,
-                                width: 200,
-                                borderColor: 'gray',
-                                borderWidth: 1,
-                                borderRadius: 5,
-                                paddingLeft: 10,
-                                backgroundColor: 'white',
-                            }}
-                        />
-                    </View>
-                ),
-                headerRight: () => (
-                    <View style={{ flexDirection: "row", justifyContent: "center", alignItems: 'center' }}>
-                        <TouchableOpacity onPress={() => console.log('Settings pressed')}>
-                            <MaterialIcons name="message" style={{ fontSize: 25, color: "black", marginRight: 15 }} />
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => console.log('Settings pressed')}>
-                            <MaterialIcons name="settings" style={{ fontSize: 25, color: "black", marginRight: 20 }} />
-                        </TouchableOpacity>
-                    </View>
-                ),
             })}
         >
-            <Drawer.Screen name="Home" component={Home} />
-            <Drawer.Screen name="Profile" component={Profile} />
+            <Drawer.Screen
+                name="Home"
+                component={Home}
+                options={{
+                    headerShown: true,
+                    headerTitle: () => (
+                        <View style={{ flexDirection: 'row', justifyContent: "center", alignItems: 'center', marginLeft: 10 }}>
+                            <TextInput
+                                placeholder="Search..."
+                                style={{
+                                    height: 40,
+                                    width: 200,
+                                    borderColor: 'gray',
+                                    borderWidth: 1,
+                                    borderRadius: 5,
+                                    paddingLeft: 10,
+                                    backgroundColor: 'white',
+                                }}
+                            />
+                        </View>
+                    ),
+                    headerRight: () => (
+                        <View style={{ flexDirection: "row", justifyContent: "center", alignItems: 'center' }}>
+                            <TouchableOpacity onPress={() => console.log('Settings pressed')}>
+                                <MaterialIcons name="message" style={{ fontSize: 25, color: "black", marginRight: 15 }} />
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => console.log('Settings pressed')}>
+                                <MaterialIcons name="settings" style={{ fontSize: 25, color: "black", marginRight: 20 }} />
+                            </TouchableOpacity>
+                        </View>
+                    ),
+                }}
+            />
+            <Drawer.Screen
+                name="Post"
+                component={Post}
+                options={{
+                    headerShown: true,
+                    headerTitle: () => (
+                        <View style={{ flexDirection: 'row', justifyContent: "center", alignItems: 'center', marginLeft: 10 }}>
+                            <TextInput
+                                placeholder="Search..."
+                                style={{
+                                    height: 40,
+                                    width: 200,
+                                    borderColor: 'gray',
+                                    borderWidth: 1,
+                                    borderRadius: 5,
+                                    paddingLeft: 10,
+                                    backgroundColor: 'white',
+                                }}
+                            />
+                        </View>
+                    ),
+                    headerRight: () => (
+                        <View style={{ flexDirection: "row", justifyContent: "center", alignItems: 'center' }}>
+                            <TouchableOpacity onPress={() => console.log('Settings pressed')}>
+                                <MaterialIcons name="message" style={{ fontSize: 25, color: "black", marginRight: 15 }} />
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => console.log('Settings pressed')}>
+                                <MaterialIcons name="settings" style={{ fontSize: 25, color: "black", marginRight: 20 }} />
+                            </TouchableOpacity>
+                        </View>
+                    ),
+                }}
+            />
+            <Drawer.Screen
+                name="Story"
+                component={Story}
+                options={{
+                    headerShown: true,
+                    headerTitle: () => (
+                        <View style={{ flexDirection: 'row', justifyContent: "center", alignItems: 'center', marginLeft: 10 }}>
+                            <TextInput
+                                placeholder="Search..."
+                                style={{
+                                    height: 40,
+                                    width: 200,
+                                    borderColor: 'gray',
+                                    borderWidth: 1,
+                                    borderRadius: 5,
+                                    paddingLeft: 10,
+                                    backgroundColor: 'white',
+                                }}
+                            />
+                        </View>
+                    ),
+                    headerRight: () => (
+                        <View style={{ flexDirection: "row", justifyContent: "center", alignItems: 'center' }}>
+                            <TouchableOpacity onPress={() => console.log('Settings pressed')}>
+                                <MaterialIcons name="message" style={{ fontSize: 25, color: "black", marginRight: 15 }} />
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => console.log('Settings pressed')}>
+                                <MaterialIcons name="settings" style={{ fontSize: 25, color: "black", marginRight: 20 }} />
+                            </TouchableOpacity>
+                        </View>
+                    ),
+                }}
+            />
+            <Drawer.Screen
+                name="Tracker"
+                component={Tracker}
+                options={{
+                    headerShown: true,
+                    headerTitle: () => (
+                        <View style={{ flexDirection: 'row', justifyContent: "center", alignItems: 'center', marginLeft: 10 }}>
+                            <TextInput
+                                placeholder="Search..."
+                                style={{
+                                    height: 40,
+                                    width: 200,
+                                    borderColor: 'gray',
+                                    borderWidth: 1,
+                                    borderRadius: 5,
+                                    paddingLeft: 10,
+                                    backgroundColor: 'white',
+                                }}
+                            />
+                        </View>
+                    ),
+                    headerRight: () => (
+                        <View style={{ flexDirection: "row", justifyContent: "center", alignItems: 'center' }}>
+                            <TouchableOpacity onPress={() => console.log('Settings pressed')}>
+                                <MaterialIcons name="message" style={{ fontSize: 25, color: "black", marginRight: 15 }} />
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => console.log('Settings pressed')}>
+                                <MaterialIcons name="settings" style={{ fontSize: 25, color: "black", marginRight: 20 }} />
+                            </TouchableOpacity>
+                        </View>
+                    ),
+                }}
+            />
+            <Drawer.Screen
+                name="Product"
+                component={Product}
+                options={{
+                    headerShown: true,
+                    headerTitle: () => (
+                        <View style={{ flexDirection: 'row', justifyContent: "center", alignItems: 'center', marginLeft: 10 }}>
+                            <TextInput
+                                placeholder="Search..."
+                                style={{
+                                    height: 40,
+                                    width: 200,
+                                    borderColor: 'gray',
+                                    borderWidth: 1,
+                                    borderRadius: 5,
+                                    paddingLeft: 10,
+                                    backgroundColor: 'white',
+                                }}
+                            />
+                        </View>
+                    ),
+                    headerRight: () => (
+                        <View style={{ flexDirection: "row", justifyContent: "center", alignItems: 'center' }}>
+                            <TouchableOpacity onPress={() => console.log('Settings pressed')}>
+                                <MaterialIcons name="message" style={{ fontSize: 25, color: "black", marginRight: 15 }} />
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => console.log('Settings pressed')}>
+                                <MaterialIcons name="settings" style={{ fontSize: 25, color: "black", marginRight: 20 }} />
+                            </TouchableOpacity>
+                        </View>
+                    ),
+                }}
+            />
+            <Drawer.Screen
+                name="Profile"
+                component={Profile}
+                options={{
+                    headerShown: true,
+                    headerTitle: () => (
+                        <View style={{ flexDirection: 'row', justifyContent: "center", alignItems: 'center', marginLeft: 10 }}>
+                            <TextInput
+                                placeholder="Search..."
+                                style={{
+                                    height: 40,
+                                    width: 200,
+                                    borderColor: 'gray',
+                                    borderWidth: 1,
+                                    borderRadius: 5,
+                                    paddingLeft: 10,
+                                    backgroundColor: 'white',
+                                }}
+                            />
+                        </View>
+                    ),
+                    headerRight: () => (
+                        <View style={{ flexDirection: "row", justifyContent: "center", alignItems: 'center' }}>
+                            <TouchableOpacity onPress={() => console.log('Settings pressed')}>
+                                <MaterialIcons name="message" style={{ fontSize: 25, color: "black", marginRight: 15 }} />
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => console.log('Settings pressed')}>
+                                <MaterialIcons name="settings" style={{ fontSize: 25, color: "black", marginRight: 20 }} />
+                            </TouchableOpacity>
+                        </View>
+                    ),
+                }}
+            />
         </Drawer.Navigator>
     );
 }
@@ -79,18 +286,6 @@ const RootNavigation = () => {
     const username = useSelector(selectUser);
     const isVerified = useSelector(selectIsVerified);
     const authenticatedUser = username && isVerified;
-
-    const handleLogout = async () => {
-        try {
-            dispatch(login(""));
-            await SecureStore.deleteItemAsync('authToken');
-            const data = await client.delete('/auth/logout');
-            Alert.alert("Success", data.message);
-            navigation.navigate('Login');
-        } catch (error) {
-            console.error("Error in logout", error);
-        }
-    };
 
     // Fetch token and authenticate user on app load
     useEffect(() => {
@@ -144,19 +339,46 @@ const RootNavigation = () => {
                                 <FontAwesome5 name="user-circle" style={{ fontSize: 25, color: "black", marginLeft: 5 }} />
                             </TouchableOpacity>
                         ),
-
                     }} />
-                    <Stack.Screen name="Tracker" component={Tracker} options={{ headerBackTitle: 'Back', headerShown: false }} />
-                    <Stack.Screen name="Post" component={Post} options={{ headerBackTitle: 'Back', headerShown: false }} />
-                    <Stack.Screen name="Product" component={Product} options={{ headerBackTitle: 'Back', headerShown: false }} />
-                    <Stack.Screen name="Story" component={Story} options={{ headerBackTitle: 'Back', headerShown: false }} />
-                    <Stack.Screen name="Profile" component={Profile} options={{
-                        // headerBackTitle: 'Back', headerRight: () =>
-                        //     <View>
-                        //         <TouchableOpacity onPress={handleLogout}>
-                        //             <FontAwesome5 name="sign-out-alt" style={{ fontSize: 25, color: "black" }} />
-                        //         </TouchableOpacity>
-                        //     </View>
+                    <Stack.Screen name="Tracker" component={DrawerNavigation} options={{
+                        headerShown: false,
+                        headerLeft: () => (
+                            <TouchableOpacity onPress={() => navigation.openDrawer()}>
+                                <FontAwesome5 name="user-circle" style={{ fontSize: 25, color: "black", marginLeft: 5 }} />
+                            </TouchableOpacity>
+                        ),
+                    }} />
+                    <Stack.Screen name="Post" component={DrawerNavigation} options={{
+                        headerShown: false,
+                        headerLeft: () => (
+                            <TouchableOpacity onPress={() => navigation.openDrawer()}>
+                                <FontAwesome5 name="user-circle" style={{ fontSize: 25, color: "black", marginLeft: 5 }} />
+                            </TouchableOpacity>
+                        ),
+                    }} />
+                    <Stack.Screen name="Product" component={DrawerNavigation} options={{
+                        headerShown: false,
+                        headerLeft: () => (
+                            <TouchableOpacity onPress={() => navigation.openDrawer()}>
+                                <FontAwesome5 name="user-circle" style={{ fontSize: 25, color: "black", marginLeft: 5 }} />
+                            </TouchableOpacity>
+                        ),
+                    }} />
+                    <Stack.Screen name="Story" component={DrawerNavigation} options={{
+                        headerShown: false,
+                        headerLeft: () => (
+                            <TouchableOpacity onPress={() => navigation.openDrawer()}>
+                                <FontAwesome5 name="user-circle" style={{ fontSize: 25, color: "black", marginLeft: 5 }} />
+                            </TouchableOpacity>
+                        ),
+                    }} />
+                    <Stack.Screen name="Profile" component={DrawerNavigation} options={{
+                        headerShown: false,
+                        headerLeft: () => (
+                            <TouchableOpacity onPress={() => navigation.openDrawer()}>
+                                <FontAwesome5 name="user-circle" style={{ fontSize: 25, color: "black", marginLeft: 5 }} />
+                            </TouchableOpacity>
+                        ),
                     }} />
                 </>
             ) : (
@@ -197,4 +419,20 @@ const RootNavigation = () => {
     );
 };
 
-export { RootNavigation, DrawerNavigation };
+const styles = StyleSheet.create({
+    logoutButton: {
+        flexDirection: "row",
+        alignItems: "center",
+        padding: 15,
+        borderTopWidth: 1,
+        borderColor: "#ccc",
+    },
+    logoutText: {
+        marginLeft: 10,
+        fontSize: 16,
+        color: "black",
+    },
+});
+
+
+export default RootNavigation;
