@@ -87,7 +87,7 @@ const SignUp = () => {
                             }}
                         >
                             <Image
-                                source={require('../../../assets/icon.png')}
+                                source={require('../../../assets/iconbg.png')}
                                 style={{
                                     width: 100,
                                     height: 100,

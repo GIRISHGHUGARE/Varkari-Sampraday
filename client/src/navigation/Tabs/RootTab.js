@@ -12,8 +12,8 @@ const RootTab = () => {
         { name: 'Home', icon: 'home', iconType: FontAwesome5Icon },
         { name: 'Tracker', icon: 'location-dot', iconType: FontAwesome6Icon },
         { name: 'Post', icon: 'circle-plus', iconType: FontAwesome6Icon },
+        { name: 'Story', icon: 'book-open', iconType: FontAwesome5Icon },
         { name: 'Product', icon: 'cart-shopping', iconType: FontAwesome6Icon },
-        { name: 'Profile', icon: 'user-alt', iconType: FontAwesome5Icon },
     ];
 
     return (
