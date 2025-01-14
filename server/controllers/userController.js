@@ -201,6 +201,7 @@ const loginUser = async (req, res) => {
                 _id: user._id,
                 username: user.username,
                 email: user.email,
+                profilePhoto: user.profilePhoto,
                 summary: user.summary,
                 isVerified: user.isVerified
             }
@@ -261,9 +262,10 @@ const updateUser = async (req, res) => {
                 message: "User not found",
             });
         }
-        const { username, summary } = req.body;
+        const { username, profilePhoto, summary } = req.body;
         const updatedUser = await User.findOneAndUpdate(user._id, {
             username: username,
+            profilePhoto: profilePhoto,
             summary: summary
         }, { new: true });
         try {
@@ -275,6 +277,7 @@ const updateUser = async (req, res) => {
                     _id: user._id,
                     username: user.username,
                     email: user.email,
+                    profilePhoto: user.profilePhoto,
                     isVerified: user.isVerified,
                     summary: user.summary
                 }

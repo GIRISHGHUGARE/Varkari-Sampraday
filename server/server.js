@@ -9,6 +9,7 @@ const cookieParser = require('cookie-parser');
 // FILES
 const connectDB = require('./config/db');
 const userRoutes = require("./routes/userRoutes")
+const imageUploadRoutes = require("./routes/imageUploadRoutes")
 
 // DOTENV
 dotenv.config();
@@ -21,7 +22,7 @@ const app = express();
 
 // MIDDLEWARES
 const corsOptions = {
-    origin: 'http://192.168.0.114:8081',
+    origin: 'http://192.168.0.112:8081',
     methods: ['GET', 'POST'],
     allowedHeaders: ['Authorization', 'Content-Type'],
 };
@@ -41,6 +42,7 @@ app.get("", (req, res) => {
 
 // OTHER ROUTES
 app.use("/api/v1/auth", userRoutes)
+app.use("/api/v1/imageUpload", imageUploadRoutes)
 
 // PORT
 const PORT = process.env.PORT || 8080;

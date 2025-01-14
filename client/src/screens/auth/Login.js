@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { login, setLoading, setError } from "../../redux/features/auth/authSlice.js";
 import InputBox from "../../components/forms/InputBox.js";
 import SubmitButton from "../../components/forms/SubmitButton";
-import axios from "axios";
 import { BlurView } from 'expo-blur';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from '@react-navigation/native';
