@@ -63,6 +63,8 @@ const registerUser = async (req, res) => {
                     _id: user._id,
                     username: user.username,
                     email: user.email,
+                    profilePhoto: user.profilePhoto,
+                    summary: user.summary,
                     isVerified: user.isVerified
                 }
             });

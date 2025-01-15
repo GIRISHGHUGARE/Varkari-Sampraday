@@ -9,7 +9,7 @@ const cookieParser = require('cookie-parser');
 // FILES
 const connectDB = require('./config/db');
 const userRoutes = require("./routes/userRoutes")
-const imageUploadRoutes = require("./routes/imageUploadRoutes")
+const postRoutes = require("./routes/postRoutes")
 
 // DOTENV
 dotenv.config();
@@ -42,7 +42,7 @@ app.get("", (req, res) => {
 
 // OTHER ROUTES
 app.use("/api/v1/auth", userRoutes)
-app.use("/api/v1/imageUpload", imageUploadRoutes)
+app.use("/api/v1/post", postRoutes)
 
 // PORT
 const PORT = process.env.PORT || 8080;

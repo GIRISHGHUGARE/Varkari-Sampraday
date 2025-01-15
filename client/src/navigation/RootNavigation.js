@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, TouchableOpacity, Alert, TextInput, StyleSheet, Text } from 'react-native';
+import { View, TouchableOpacity, Alert, TextInput, StyleSheet, Text, Image } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
 import { useSelector, useDispatch } from 'react-redux';
@@ -64,6 +64,7 @@ const CustomDrawerContent = (props) => {
     );
 };
 const DrawerNavigation = () => {
+    const profilePhoto = useSelector((state) => state.auth.user.profilePhoto)
     return (
         <Drawer.Navigator
             drawerContent={(props) => <CustomDrawerContent {...props} />}
@@ -73,7 +74,10 @@ const DrawerNavigation = () => {
                         style={{ marginLeft: 20 }}
                         onPress={() => navigation.toggleDrawer()} // Toggle the drawer
                     >
-                        <FontAwesome5 name="user-circle" size={24} color="black" />
+                        <Image
+                            source={{ uri: profilePhoto || 'https://via.placeholder.com/50' }}
+                            style={styles.profileImage}
+                        />
                     </TouchableOpacity>
                 ),
             })}
@@ -431,6 +435,11 @@ const styles = StyleSheet.create({
         marginLeft: 10,
         fontSize: 16,
         color: "black",
+    },
+    profileImage: {
+        width: 30,
+        height: 30,
+        borderRadius: 25,
     },
 });
 

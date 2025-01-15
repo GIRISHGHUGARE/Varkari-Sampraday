@@ -12,7 +12,7 @@ const getPost = async (req, res) => {
                 message: "Unauthenticated Route!",
             });
         }
-        const post = await Post.find();
+        const post = await Post.find().sort({ createdAt: -1 });;
         return res.status(200).json({
             success: true,
             message: "User is authenticated post fetched successfully!",
@@ -47,6 +47,8 @@ const addPost = async (req, res) => {
         const post = new Post({
             uploadedPhoto,
             caption,
+            postedByName: user.username,
+            postedByProfile: user.profilePhoto,
             postedBy: userId,
         });
         await post.save();
