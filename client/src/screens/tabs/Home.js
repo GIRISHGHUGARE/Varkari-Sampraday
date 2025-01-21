@@ -22,12 +22,13 @@ const Home = () => {
 
     return (
         <View style={styles.container}>
+            {/* <RootDrawer /> */}
             <ScrollView
                 refreshControl={
                     <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
                 }
             >
-                <PostCard posts={posts} myPostScreen={true} />
+                <PostCard posts={posts} myPostScreen={false} />
             </ScrollView>
             <RootTab />
         </View>

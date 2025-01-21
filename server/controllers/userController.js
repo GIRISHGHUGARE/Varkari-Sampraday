@@ -233,8 +233,10 @@ const verifyUser = async (req, res) => {
                 _id: user._id,
                 username: user.username,
                 email: user.email,
-                isVerified: user.isVerified,
-            },
+                profilePhoto: user.profilePhoto,
+                summary: user.summary,
+                isVerified: user.isVerified
+            }
         });
     } catch (error) {
         console.error("Error in verifying user", error);

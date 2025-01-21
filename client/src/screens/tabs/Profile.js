@@ -1,13 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TextInput, Button, StyleSheet, Alert, TouchableOpacity } from 'react-native';
+import { View, Text, Image, TextInput, Button, StyleSheet, Alert, TouchableOpacity, ScrollView, Modal } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useDispatch, useSelector } from 'react-redux';
 import { login, selectUserSummary, selectUser, setLoading, selectUserProfilePhoto } from '../../redux/features/auth/authSlice';
 import client from '../../lib/axios';
 import * as SecureStore from 'expo-secure-store';
+import { MaterialIcons } from '@expo/vector-icons';
+import PostCard from '../../components/cards/PostCard';
+import { useNavigation } from '@react-navigation/native';  // For navigation to "All Posts" screen
+import { fetchUserPosts } from '../../redux/features/post/userPostSlice';
+import FontAwesome6Icon from 'react-native-vector-icons/FontAwesome6';
+
 
 const Profile = () => {
     const dispatch = useDispatch();
+    const navigation = useNavigation();
 
     // Fetch data from Redux store
     const user = useSelector(selectUser);
@@ -16,26 +23,55 @@ const Profile = () => {
     const loading = useSelector((state) => state.auth.loading);
 
     // Local state
-    const [profilePhoto, setProfilePhoto] = useState(null); // For uploaded photo
-    const [username, setUsername] = useState(''); // Username state
-    const [summary, setSummary] = useState(''); // Summary state
+    const [profilePhoto, setProfilePhoto] = useState(null);
+    const [username, setUsername] = useState('');
+    const [summary, setSummary] = useState('');
+    const [modalVisible, setModalVisible] = useState(false);
+    const posts = useSelector((state) => state.userpost);
 
-    // Initialize username and summary with values from Redux store
+    useEffect(() => {
+        dispatch(fetchUserPosts());
+    }, [dispatch]);
+
+    useEffect(() => {
+        const checkAuth = async () => {
+            const token = await SecureStore.getItemAsync('authToken');
+            if (token) {
+                try {
+                    dispatch(setLoading(true));
+                    const response = await client.get('/auth/verify-user', {
+                        headers: { Authorization: `Bearer ${token}` },
+                    });
+                    if (response.data.success && response.data.user) {
+                        dispatch(login(response.data.user));
+                    } else {
+                        dispatch(setError('Authentication failed'));
+                    }
+                } catch (error) {
+                    dispatch(setError('Token verification failed'));
+                    console.error("Error during token verification:", error);
+                } finally {
+                    dispatch(setLoading(false));
+                }
+            }
+        };
+
+        checkAuth();
+    }, [dispatch]);
+
     useEffect(() => {
         if (user) {
-            setUsername(user || ''); // Set username from Redux
+            setUsername(user || '');
         }
         if (userSummary) {
-            setSummary(userSummary || ''); // Set summary from Redux
+            setSummary(userSummary || '');
         }
         if (userProfilePhoto) {
-            setProfilePhoto(userProfilePhoto)
+            setProfilePhoto(userProfilePhoto);
         }
     }, [user, userSummary, userProfilePhoto]);
 
-    // Handle profile photo selection
     const handleSelectPhoto = async () => {
-        // Request permission to access media library
         const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
         if (!permissionResult.granted) {
@@ -43,41 +79,36 @@ const Profile = () => {
             return;
         }
 
-        // Open image picker
         const result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
             allowsEditing: true,
-            aspect: [1, 1], // Crop to square aspect ratio
-            quality: 1, // Image quality (0 to 1)
+            aspect: [1, 1],
+            quality: 1,
         });
 
         if (!result.canceled) {
             const selectedImageUri = result.assets[0].uri;
-            setProfilePhoto(selectedImageUri); // Set the selected image URI
+            setProfilePhoto(selectedImageUri);
 
-            // Upload the image to Cloudinary
             const uploadResponse = await uploadToCloudinary(selectedImageUri);
             if (uploadResponse) {
-                // Save the Cloudinary URL or use it directly
                 setProfilePhoto(uploadResponse.secure_url || "profile_Photo");
             }
         }
     };
 
-    // Helper function to upload image to Cloudinary (unsigned upload)
     const uploadToCloudinary = async (uri) => {
         try {
             const formData = new FormData();
             formData.append('file', {
                 uri: uri,
-                type: 'image/jpeg', // Adjust the type based on the image
-                name: 'profile_picture.jpg', // You can dynamically generate the name
+                type: 'image/jpeg',
+                name: 'profile_picture.jpg',
             });
-            formData.append('upload_preset', 'profile_pictures'); // Replace with your upload preset
-            formData.append('unsigned', 'true'); // Indicating unsigned upload
+            formData.append('upload_preset', 'profile_pictures');
+            formData.append('unsigned', 'true');
 
-            // Upload the image directly to Cloudinary
-            const response = await fetch(`https://api.cloudinary.com/v1_1/${process.env.CLOUD_NAME}/image/upload`, {
+            const response = await fetch(`https://api.cloudinary.com/v1_1//image/upload`, {
                 method: 'POST',
                 body: formData,
             });
@@ -85,94 +116,138 @@ const Profile = () => {
             const data = await response.json();
 
             if (data.secure_url) {
-                console.log('Cloudinary upload success');
-                Alert.alert('Passed to upload the profile image');
-                return data; // Return the response data containing the Cloudinary URL
+                return data;
             } else {
                 throw new Error('Failed to upload image');
             }
         } catch (error) {
-            console.error('Cloudinary upload error:', error);
             Alert.alert('Error', 'Failed to upload the profile image');
         }
     };
 
-    // Handle saving profile changes
     const handleSaveProfile = async () => {
         try {
             dispatch(setLoading(true));
             const token = await SecureStore.getItemAsync('authToken');
             const { data } = await client.put(
                 '/auth/update-user',
-                { username, profilePhoto, summary }, // This is the body
-                { headers: { Authorization: `Bearer ${token}` } } // This is the options (headers)
+                { username, profilePhoto, summary },
+                { headers: { Authorization: `Bearer ${token}` } }
             );
             dispatch(setLoading(false));
-            // Update Redux store with updated user information
-            dispatch(login(data.user)); // Dispatch updated user data to Redux store
+            dispatch(login(data.user));
             Alert.alert('Success', data.message);
+            setModalVisible(false);  // Close the modal after saving
         } catch (error) {
             Alert.alert('Error', error.response?.data?.message || 'Failed to save profile changes');
             dispatch(setLoading(false));
-            console.log(error);
         }
     };
 
+    // Handle navigation to all posts page
+    const handleShowAllPosts = () => {
+        navigation.navigate('AllPosts'); // Navigate to the "AllPosts" screen
+    };
+
     return (
-        <View style={styles.container}>
-            {/* Profile Picture */}
-            <TouchableOpacity onPress={handleSelectPhoto} style={styles.imageContainer}>
-                {profilePhoto ? (
-                    <Image source={{ uri: profilePhoto }} style={styles.profileImage} />
-                ) : (
-                    <View style={styles.placeholder}>
-                        <Text style={styles.placeholderText}>Upload Photo</Text>
+        <ScrollView contentContainerStyle={styles.container}>
+            <View style={styles.headerSection}>
+                <View style={styles.header}>
+                    <TouchableOpacity onPress={handleSelectPhoto} style={styles.imageContainer}>
+                        {profilePhoto ? (
+                            <Image source={{ uri: profilePhoto }} style={styles.profileImage} />
+                        ) : (
+                            <View style={styles.placeholder}>
+                                <Text style={styles.placeholderText}>Upload Photo</Text>
+                            </View>
+                        )}
+                    </TouchableOpacity>
+                    <View style={styles.profileInfo}>
+                        <TouchableOpacity onPress={() => setModalVisible(true)}>
+                            <MaterialIcons name="edit" size={24} color="#0073b1" style={styles.editIcon} />
+                        </TouchableOpacity>
                     </View>
-                )}
-            </TouchableOpacity>
+                </View>
+                <View style={{ paddingTop: 20 }}>
+                    <Text style={styles.username}>{username}</Text>
+                    <Text style={styles.summaryLabel}>{summary}</Text>
+                </View>
+            </View>
 
-            {/* Username Input */}
-            <TextInput
-                style={styles.input}
-                placeholder="Enter your username"
-                value={username}
-                onChangeText={setUsername}
-            />
 
-            {/* Summary Input */}
-            <TextInput
-                style={[styles.input, styles.textArea]}
-                placeholder="Write a short summary about yourself"
-                value={summary}
-                onChangeText={setSummary}
-                multiline
-            />
+            {/* Activity Section */}
+            <View style={styles.activitySection}>
+                <Text style={styles.activityTitle}>Activity</Text>
+                <PostCard posts={posts} myPostScreen={true} />
+                <TouchableOpacity onPress={handleShowAllPosts}>
+                    <View style={styles.showAllPostsButton}>
+                        <Text style={styles.showAllPostsButtonText}>Show All Posts</Text>
+                        <FontAwesome6Icon name="arrow-right" size={18} color="gray" />
+                    </View>
+                </TouchableOpacity>
+            </View>
 
-            {/* Save Button */}
-            <Button
-                title={loading ? 'Saving...' : 'Save Profile'}
-                onPress={handleSaveProfile}
-                disabled={loading}
-            />
-        </View>
+            {/* Edit Profile Modal */}
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => setModalVisible(false)}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={styles.modalContainer}>
+                        <Text style={styles.modalTitle}>Edit Profile</Text>
+
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Enter your username"
+                            value={username}
+                            onChangeText={setUsername}
+                        />
+                        <TextInput
+                            style={[styles.input, styles.textArea]}
+                            placeholder="Write a short summary about yourself"
+                            value={summary}
+                            onChangeText={setSummary}
+                            multiline
+                        />
+
+                        <View style={styles.modalButtons}>
+                            <Button title="Cancel" onPress={() => setModalVisible(false)} />
+                            <Button
+                                title={loading ? 'Saving...' : 'Save Profile'}
+                                onPress={handleSaveProfile}
+                                disabled={loading}
+                            />
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+        </ScrollView>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        padding: 20,
+        flexGrow: 1,
+        backgroundColor: '#f5f5f5',
+    },
+    header: {
+        flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#fff',
+    },
+    headerSection: {
+        padding: 10,
+        backgroundColor: '#ffffff',
     },
     imageContainer: {
         width: 120,
         height: 120,
         borderRadius: 60,
-        borderWidth: 1,
-        borderColor: '#ccc',
+        borderWidth: 2,
+        borderColor: '#0073b1',
         overflow: 'hidden',
-        marginBottom: 20,
+        marginRight: 20,
     },
     profileImage: {
         width: '100%',
@@ -187,6 +262,32 @@ const styles = StyleSheet.create({
     placeholderText: {
         color: '#999',
     },
+    profileInfo: {
+        flex: 1,
+    },
+    username: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#333',
+    },
+    summaryLabel: {
+        fontSize: 14,
+        color: '#0073b1',
+        marginTop: 5,
+    },
+    editIcon: {
+        alignSelf: 'flex-end',
+    },
+    activitySection: {
+        backgroundColor: '#ffffff',
+        marginTop: 10,
+    },
+    activityTitle: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        marginLeft: 10,
+        marginTop: 10
+    },
     input: {
         width: '100%',
         padding: 15,
@@ -194,10 +295,47 @@ const styles = StyleSheet.create({
         borderColor: '#ccc',
         borderRadius: 10,
         marginBottom: 15,
+        backgroundColor: '#fff',
     },
     textArea: {
         height: 100,
         textAlignVertical: 'top',
+    },
+    modalOverlay: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContainer: {
+        width: '80%',
+        padding: 20,
+        backgroundColor: '#fff',
+        borderRadius: 10,
+    },
+    modalTitle: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        marginBottom: 20,
+        textAlign: 'center',
+    },
+    modalButtons: {
+        marginTop: 20,
+    },
+    showAllPostsButton: {
+        fontSize: 22,
+        marginTop: 20,
+        flexDirection: 'row',
+        justifyContent: "center",
+        alignItems: "center",
+        borderTopWidth: 1,
+        height: 50,
+        borderTopColor: "gray"
+    },
+    showAllPostsButtonText: {
+        fontSize: 18,
+        marginRight: 10,
+        color: "gray"
     },
 });
 

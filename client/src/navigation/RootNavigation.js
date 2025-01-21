@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { View, TouchableOpacity, Alert, TextInput, StyleSheet, Text, Image } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList } from '@react-navigation/drawer';
+import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
 import { useSelector, useDispatch } from 'react-redux';
 import * as SecureStore from 'expo-secure-store';
 import { login, setLoading, setError } from '../redux/features/auth/authSlice.js';
@@ -9,7 +9,7 @@ import { selectUser, selectIsVerified } from '../redux/features/auth/authSlice.j
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
-
+import FontAwesome6Icon from 'react-native-vector-icons/FontAwesome6';
 
 // File imports
 import Home from "../screens/tabs/Home.js";
@@ -49,7 +49,11 @@ const CustomDrawerContent = (props) => {
         <View style={{ flex: 1 }}>
             {/* Scrollable list of drawer items */}
             <DrawerContentScrollView {...props}>
-                <DrawerItemList {...props} />
+                <DrawerItem
+                    label="Profile"
+                    onPress={() => props.navigation.navigate("Profile")}
+                    icon={() => <FontAwesome6Icon name="circle-user" size={25} color="black" />}
+                />
             </DrawerContentScrollView>
 
             {/* Logout Button at the Bottom */}
@@ -74,10 +78,18 @@ const DrawerNavigation = () => {
                         style={{ marginLeft: 20 }}
                         onPress={() => navigation.toggleDrawer()} // Toggle the drawer
                     >
-                        <Image
-                            source={{ uri: profilePhoto || 'https://via.placeholder.com/50' }}
-                            style={styles.profileImage}
-                        />
+                        {profilePhoto ?
+                            (
+                                <Image
+                                    source={{ uri: profilePhoto }}
+                                    style={styles.profileImage}
+                                />
+                            ) :
+                            (
+                                <FontAwesome6Icon name="user-circle" size={25} />
+                            )
+                        }
+
                     </TouchableOpacity>
                 ),
             })}
@@ -336,54 +348,12 @@ const RootNavigation = () => {
         <Stack.Navigator initialRouteName={authenticatedUser ? "Home" : "Login"}>
             {authenticatedUser ? (
                 <>
-                    <Stack.Screen name="Home" component={DrawerNavigation} options={{
-                        headerShown: false,
-                        headerLeft: () => (
-                            <TouchableOpacity onPress={() => navigation.openDrawer()}>
-                                <FontAwesome5 name="user-circle" style={{ fontSize: 25, color: "black", marginLeft: 5 }} />
-                            </TouchableOpacity>
-                        ),
-                    }} />
-                    <Stack.Screen name="Tracker" component={DrawerNavigation} options={{
-                        headerShown: false,
-                        headerLeft: () => (
-                            <TouchableOpacity onPress={() => navigation.openDrawer()}>
-                                <FontAwesome5 name="user-circle" style={{ fontSize: 25, color: "black", marginLeft: 5 }} />
-                            </TouchableOpacity>
-                        ),
-                    }} />
-                    <Stack.Screen name="Post" component={DrawerNavigation} options={{
-                        headerShown: false,
-                        headerLeft: () => (
-                            <TouchableOpacity onPress={() => navigation.openDrawer()}>
-                                <FontAwesome5 name="user-circle" style={{ fontSize: 25, color: "black", marginLeft: 5 }} />
-                            </TouchableOpacity>
-                        ),
-                    }} />
-                    <Stack.Screen name="Product" component={DrawerNavigation} options={{
-                        headerShown: false,
-                        headerLeft: () => (
-                            <TouchableOpacity onPress={() => navigation.openDrawer()}>
-                                <FontAwesome5 name="user-circle" style={{ fontSize: 25, color: "black", marginLeft: 5 }} />
-                            </TouchableOpacity>
-                        ),
-                    }} />
-                    <Stack.Screen name="Story" component={DrawerNavigation} options={{
-                        headerShown: false,
-                        headerLeft: () => (
-                            <TouchableOpacity onPress={() => navigation.openDrawer()}>
-                                <FontAwesome5 name="user-circle" style={{ fontSize: 25, color: "black", marginLeft: 5 }} />
-                            </TouchableOpacity>
-                        ),
-                    }} />
-                    <Stack.Screen name="Profile" component={DrawerNavigation} options={{
-                        headerShown: false,
-                        headerLeft: () => (
-                            <TouchableOpacity onPress={() => navigation.openDrawer()}>
-                                <FontAwesome5 name="user-circle" style={{ fontSize: 25, color: "black", marginLeft: 5 }} />
-                            </TouchableOpacity>
-                        ),
-                    }} />
+                    <Stack.Screen name="Home" component={DrawerNavigation} options={{ headerShown: false }} />
+                    <Stack.Screen name="Tracker" component={DrawerNavigation} options={{ headerShown: false }} />
+                    <Stack.Screen name="Post" component={DrawerNavigation} options={{ headerShown: false }} />
+                    <Stack.Screen name="Product" component={DrawerNavigation} options={{ headerShown: false }} />
+                    <Stack.Screen name="Story" component={DrawerNavigation} options={{ headerShown: false }} />
+                    <Stack.Screen name="Profile" component={DrawerNavigation} options={{ headerShown: false }} />
                 </>
             ) : (
                 <>

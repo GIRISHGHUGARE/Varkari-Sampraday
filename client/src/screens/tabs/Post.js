@@ -60,7 +60,7 @@ const Post = () => {
             formData.append('unsigned', 'true'); // Indicating unsigned upload
 
             // Upload the image directly to Cloudinary
-            const response = await fetch(`https://api.cloudinary.com/v1_1/${process.env.CLOUD_NAME}/image/upload`, {
+            const response = await fetch(`https://api.cloudinary.com/v1_1//image/upload`, {
                 method: 'POST',
                 body: formData,
             });
