@@ -50,10 +50,12 @@ const addProduct = async (req, res) => {
                 message: "Product created successfully!"
             })
         }
-        res.status(500).json({
-            success: false,
-            message: 'Unauthenticated route!'
-        });
+        else {
+            res.status(500).json({
+                success: false,
+                message: 'Unauthenticated route!'
+            });
+        }
     } catch (error) {
         res.status(500).json({
             success: false,

@@ -1,14 +1,23 @@
 const mongoose = require("mongoose");
 
 const liveTrackerSchema = new mongoose.Schema({
-    currentlocation: {
-        type: String,
+    user: {
+        type: mongoose.Schema.ObjectId,
+        ref: "User",
         required: true,
     },
-    route: {
-
+    currentLocation: {
+        type: {
+            latitude: { type: Number, required: true },
+            longitude: { type: Number, required: true },
+        },
+        required: true,
     },
-    nearbyfacilities: {
-
+    timestamp: {
+        type: Date,
+        default: Date.now,
     },
-})
+});
+
+const LiveTracker = mongoose.model("LiveTracker", liveTrackerSchema);
+module.exports = LiveTracker;

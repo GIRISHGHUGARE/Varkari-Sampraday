@@ -127,39 +127,7 @@ const DrawerNavigation = () => {
                     ),
                 }}
             />
-            <Drawer.Screen
-                name="Post"
-                component={Post}
-                options={{
-                    headerShown: true,
-                    headerTitle: () => (
-                        <View style={{ flexDirection: 'row', justifyContent: "center", alignItems: 'center', marginLeft: 10 }}>
-                            <TextInput
-                                placeholder="Search..."
-                                style={{
-                                    height: 40,
-                                    width: 200,
-                                    borderColor: 'gray',
-                                    borderWidth: 1,
-                                    borderRadius: 5,
-                                    paddingLeft: 10,
-                                    backgroundColor: 'white',
-                                }}
-                            />
-                        </View>
-                    ),
-                    headerRight: () => (
-                        <View style={{ flexDirection: "row", justifyContent: "center", alignItems: 'center' }}>
-                            <TouchableOpacity onPress={() => console.log('Settings pressed')}>
-                                <MaterialIcons name="message" style={{ fontSize: 25, color: "black", marginRight: 15 }} />
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={() => console.log('Settings pressed')}>
-                                <MaterialIcons name="settings" style={{ fontSize: 25, color: "black", marginRight: 20 }} />
-                            </TouchableOpacity>
-                        </View>
-                    ),
-                }}
-            />
+
             <Drawer.Screen
                 name="Story"
                 component={Story}
@@ -350,43 +318,16 @@ const RootNavigation = () => {
                 <>
                     <Stack.Screen name="Home" component={DrawerNavigation} options={{ headerShown: false }} />
                     <Stack.Screen name="Tracker" component={DrawerNavigation} options={{ headerShown: false }} />
-                    <Stack.Screen name="Post" component={DrawerNavigation} options={{ headerShown: false }} />
+                    <Stack.Screen name="Post" component={Post} options={{ headerShown: false }} />
                     <Stack.Screen name="Product" component={DrawerNavigation} options={{ headerShown: false }} />
                     <Stack.Screen name="Story" component={DrawerNavigation} options={{ headerShown: false }} />
                     <Stack.Screen name="Profile" component={DrawerNavigation} options={{ headerShown: false }} />
                 </>
             ) : (
                 <>
-                    <Stack.Screen
-                        name="SignUp"
-                        component={SignUp}
-                        options={{
-                            headerShown: false,
-                            title: "Sign Up",
-                            headerStyle: { backgroundColor: '#812F21' },
-                            headerTitleAlign: 'center',
-                        }}
-                    />
-                    <Stack.Screen
-                        name="OtpScreen"
-                        component={OtpScreen}
-                        options={{
-                            headerShown: false,
-                            title: "Sign Up",
-                            headerStyle: { backgroundColor: '#812F21' },
-                            headerTitleAlign: 'center',
-                        }}
-                    />
-                    <Stack.Screen
-                        name="Login"
-                        component={Login}
-                        options={{
-                            headerShown: false,
-                            title: "Login",
-                            headerStyle: { backgroundColor: '#812F21' },
-                            headerTitleAlign: 'center',
-                        }}
-                    />
+                    <Stack.Screen name="SignUp" component={SignUp} options={{ headerShown: false }} />
+                    <Stack.Screen name="OtpScreen" component={OtpScreen} options={{ headerShown: false }} />
+                    <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
                 </>
             )}
         </Stack.Navigator>
