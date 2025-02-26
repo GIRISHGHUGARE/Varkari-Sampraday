@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { View, TouchableOpacity, Alert, TextInput, StyleSheet, Text, Image } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, TouchableOpacity, Alert, TextInput, StyleSheet, Text, Image, Animated } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
 import { useSelector, useDispatch } from 'react-redux';
@@ -26,6 +26,51 @@ import Story from '../screens/tabs/Story.js';
 // Create navigators
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
+
+
+const AnimatedTitle = ({ title }) => {
+    const [letterAnimations, setLetterAnimations] = useState([]);
+
+    useEffect(() => {
+        const animations = title.split('').map(() => new Animated.Value(0)); // Initialize opacity for each letter
+        setLetterAnimations(animations);
+
+        // Creating the animation sequence for the letters to fade in one by one
+        const animationsSequence = animations.map((anim, index) =>
+            Animated.timing(anim, {
+                toValue: 1,
+                duration: 500,
+                delay: 100 * index, // Delay between each letter
+                useNativeDriver: true,
+            })
+        );
+
+        // Looping the animation
+        const loopAnimation = Animated.loop(
+            Animated.stagger(100, animationsSequence) // Apply staggered animation
+        );
+
+        loopAnimation.start(); // Start the animation loop
+    }, [title]);
+
+    return (
+        <View style={{ flexDirection: 'row' }}>
+            {title.split('').map((letter, index) => (
+                <Animated.Text
+                    key={index}
+                    style={{
+                        opacity: letterAnimations[index],
+                        fontSize: 24,  // Adjust the font size as needed
+                        fontWeight: 'bold',  // Make the text bold
+                        color: 'black',  // You can change the color
+                    }}
+                >
+                    {letter}
+                </Animated.Text>
+            ))}
+        </View>
+    );
+};
 
 // Access navigation from props
 const CustomDrawerContent = (props) => {
@@ -99,27 +144,29 @@ const DrawerNavigation = () => {
                 component={Home}
                 options={{
                     headerShown: true,
-                    headerTitle: () => (
-                        <View style={{ flexDirection: 'row', justifyContent: "center", alignItems: 'center', marginLeft: 10 }}>
-                            <TextInput
-                                placeholder="Search..."
-                                style={{
-                                    height: 40,
-                                    width: 200,
-                                    borderColor: 'gray',
-                                    borderWidth: 1,
-                                    borderRadius: 5,
-                                    paddingLeft: 10,
-                                    backgroundColor: 'white',
-                                }}
-                            />
-                        </View>
-                    ),
+                    headerTitle: () => <AnimatedTitle title="Jai Hari Mauli !" />,
+                    headerTitleAlign: "center",
+                    // headerTitle: () => (
+                    //     <View style={{ flexDirection: 'row', justifyContent: "center", alignItems: 'center', marginLeft: 10 }}>
+                    //         <TextInput
+                    //             placeholder="Search..."
+                    //             style={{
+                    //                 height: 40,
+                    //                 width: 200,
+                    //                 borderColor: 'gray',
+                    //                 borderWidth: 1,
+                    //                 borderRadius: 5,
+                    //                 paddingLeft: 10,
+                    //                 backgroundColor: 'white',
+                    //             }}
+                    //         />
+                    //     </View>
+                    // ),
                     headerRight: () => (
                         <View style={{ flexDirection: "row", justifyContent: "center", alignItems: 'center' }}>
-                            <TouchableOpacity onPress={() => console.log('Settings pressed')}>
+                            {/* <TouchableOpacity onPress={() => console.log('Settings pressed')}>
                                 <MaterialIcons name="message" style={{ fontSize: 25, color: "black", marginRight: 15 }} />
-                            </TouchableOpacity>
+                            </TouchableOpacity> */}
                             <TouchableOpacity onPress={() => console.log('Settings pressed')}>
                                 <MaterialIcons name="settings" style={{ fontSize: 25, color: "black", marginRight: 20 }} />
                             </TouchableOpacity>
@@ -133,22 +180,23 @@ const DrawerNavigation = () => {
                 component={Story}
                 options={{
                     headerShown: true,
-                    headerTitle: () => (
-                        <View style={{ flexDirection: 'row', justifyContent: "center", alignItems: 'center', marginLeft: 10 }}>
-                            <TextInput
-                                placeholder="Search..."
-                                style={{
-                                    height: 40,
-                                    width: 200,
-                                    borderColor: 'gray',
-                                    borderWidth: 1,
-                                    borderRadius: 5,
-                                    paddingLeft: 10,
-                                    backgroundColor: 'white',
-                                }}
-                            />
-                        </View>
-                    ),
+                    headerTitle: "",
+                    // headerTitle: () => (
+                    //     <View style={{ flexDirection: 'row', justifyContent: "center", alignItems: 'center', marginLeft: 10 }}>
+                    //         <TextInput
+                    //             placeholder="Search..."
+                    //             style={{
+                    //                 height: 40,
+                    //                 width: 200,
+                    //                 borderColor: 'gray',
+                    //                 borderWidth: 1,
+                    //                 borderRadius: 5,
+                    //                 paddingLeft: 10,
+                    //                 backgroundColor: 'white',
+                    //             }}
+                    //         />
+                    //     </View>
+                    // ),
                     headerRight: () => (
                         <View style={{ flexDirection: "row", justifyContent: "center", alignItems: 'center' }}>
                             <TouchableOpacity onPress={() => console.log('Settings pressed')}>
@@ -166,27 +214,13 @@ const DrawerNavigation = () => {
                 component={Tracker}
                 options={{
                     headerShown: true,
-                    headerTitle: () => (
-                        <View style={{ flexDirection: 'row', justifyContent: "center", alignItems: 'center', marginLeft: 10 }}>
-                            <TextInput
-                                placeholder="Search..."
-                                style={{
-                                    height: 40,
-                                    width: 200,
-                                    borderColor: 'gray',
-                                    borderWidth: 1,
-                                    borderRadius: 5,
-                                    paddingLeft: 10,
-                                    backgroundColor: 'white',
-                                }}
-                            />
-                        </View>
-                    ),
+                    headerTitle: () => <AnimatedTitle title="Jai Hari Vitthal !" />,
+                    headerTitleAlign: "center",
                     headerRight: () => (
                         <View style={{ flexDirection: "row", justifyContent: "center", alignItems: 'center' }}>
-                            <TouchableOpacity onPress={() => console.log('Settings pressed')}>
+                            {/* <TouchableOpacity onPress={() => console.log('Settings pressed')}>
                                 <MaterialIcons name="message" style={{ fontSize: 25, color: "black", marginRight: 15 }} />
-                            </TouchableOpacity>
+                            </TouchableOpacity> */}
                             <TouchableOpacity onPress={() => console.log('Settings pressed')}>
                                 <MaterialIcons name="settings" style={{ fontSize: 25, color: "black", marginRight: 20 }} />
                             </TouchableOpacity>
@@ -199,27 +233,13 @@ const DrawerNavigation = () => {
                 component={Product}
                 options={{
                     headerShown: true,
-                    headerTitle: () => (
-                        <View style={{ flexDirection: 'row', justifyContent: "center", alignItems: 'center', marginLeft: 10 }}>
-                            <TextInput
-                                placeholder="Search..."
-                                style={{
-                                    height: 40,
-                                    width: 200,
-                                    borderColor: 'gray',
-                                    borderWidth: 1,
-                                    borderRadius: 5,
-                                    paddingLeft: 10,
-                                    backgroundColor: 'white',
-                                }}
-                            />
-                        </View>
-                    ),
+                    headerTitle: () => <AnimatedTitle title="Jai Hari Mauli !" />,
+                    headerTitleAlign: "center",
                     headerRight: () => (
                         <View style={{ flexDirection: "row", justifyContent: "center", alignItems: 'center' }}>
-                            <TouchableOpacity onPress={() => console.log('Settings pressed')}>
+                            {/* <TouchableOpacity onPress={() => console.log('Settings pressed')}>
                                 <MaterialIcons name="message" style={{ fontSize: 25, color: "black", marginRight: 15 }} />
-                            </TouchableOpacity>
+                            </TouchableOpacity> */}
                             <TouchableOpacity onPress={() => console.log('Settings pressed')}>
                                 <MaterialIcons name="settings" style={{ fontSize: 25, color: "black", marginRight: 20 }} />
                             </TouchableOpacity>
@@ -232,27 +252,29 @@ const DrawerNavigation = () => {
                 component={Profile}
                 options={{
                     headerShown: true,
-                    headerTitle: () => (
-                        <View style={{ flexDirection: 'row', justifyContent: "center", alignItems: 'center', marginLeft: 10 }}>
-                            <TextInput
-                                placeholder="Search..."
-                                style={{
-                                    height: 40,
-                                    width: 200,
-                                    borderColor: 'gray',
-                                    borderWidth: 1,
-                                    borderRadius: 5,
-                                    paddingLeft: 10,
-                                    backgroundColor: 'white',
-                                }}
-                            />
-                        </View>
-                    ),
+                    headerTitle: () => <AnimatedTitle title="Ram Krishna Hari !" />,
+                    headerTitleAlign: "center",
+                    // headerTitle: () => (
+                    //     <View style={{ flexDirection: 'row', justifyContent: "center", alignItems: 'center', marginLeft: 10 }}>
+                    //         <TextInput
+                    //             placeholder="Search..."
+                    //             style={{
+                    //                 height: 40,
+                    //                 width: 200,
+                    //                 borderColor: 'gray',
+                    //                 borderWidth: 1,
+                    //                 borderRadius: 5,
+                    //                 paddingLeft: 10,
+                    //                 backgroundColor: 'white',
+                    //             }}
+                    //         />
+                    //     </View>
+                    // ),
                     headerRight: () => (
                         <View style={{ flexDirection: "row", justifyContent: "center", alignItems: 'center' }}>
-                            <TouchableOpacity onPress={() => console.log('Settings pressed')}>
+                            {/* <TouchableOpacity onPress={() => console.log('Settings pressed')}>
                                 <MaterialIcons name="message" style={{ fontSize: 25, color: "black", marginRight: 15 }} />
-                            </TouchableOpacity>
+                            </TouchableOpacity> */}
                             <TouchableOpacity onPress={() => console.log('Settings pressed')}>
                                 <MaterialIcons name="settings" style={{ fontSize: 25, color: "black", marginRight: 20 }} />
                             </TouchableOpacity>

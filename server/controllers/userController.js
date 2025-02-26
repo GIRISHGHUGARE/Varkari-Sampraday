@@ -245,6 +245,46 @@ const verifyUser = async (req, res) => {
     }
 };
 
+// Search USER (PROTECTED ROUTE)
+const searchUser = async (req, res) => {
+    try {
+        const { username } = req.body;
+        const userId = req.user;  // DECODED userId WHICH IS PASSED FROM AUTHENTICATE MIDDLEWARE
+        const user = await User.findById(userId);  // FIND EVERYTHING RELATED TO USER
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found",
+            });
+        }
+
+        // Search for users with the same username (case-insensitive)
+        const users = await User.find({
+            username: { $regex: username, $options: "i" },
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: "Users found",
+            users: users.map(user => ({
+                _id: user._id,
+                username: user.username,
+                email: user.email,
+                profilePhoto: user.profilePhoto,
+                summary: user.summary,
+                isVerified: user.isVerified
+            }))
+        });
+    } catch (error) {
+        console.error("Error in verifying user", error);
+        return res.status(500).json({
+            success: false,
+            message: "Server error",
+        });
+    }
+};
+
+
 //LOGOUT FUNCTION
 const logout = async (req, res) => {
     res.clearCookie("token");
@@ -297,4 +337,4 @@ const updateUser = async (req, res) => {
 }
 
 
-module.exports = { registerUser, verifyEmail, resendVerificationEmail, loginUser, verifyUser, updateUser, logout };
+module.exports = { registerUser, verifyEmail, resendVerificationEmail, loginUser, verifyUser, updateUser, searchUser, logout };

@@ -118,7 +118,7 @@ const updatePost = async (req, res) => {
         const userId = req.user;
         const user = await User.findById(userId);
         const { id } = req.params;
-        const { uploadedPhoto, caption } = req.body;
+        const { caption } = req.body;
         if (!user) {
             res.status(500).json({
                 success: false,
@@ -130,7 +130,6 @@ const updatePost = async (req, res) => {
                 _id: id
             },
             {
-                uploadedPhoto: uploadedPhoto,
                 caption: caption
             },
             {

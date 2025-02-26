@@ -1,21 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { Alert, Modal, StyleSheet, Text, Pressable, View, TextInput } from "react-native";
-import axios from "axios";
+import client from "../../lib/axios.js";
 import { useNavigation } from "@react-navigation/native";
+import * as SecureStore from 'expo-secure-store';
 
 const EditModal = ({ modalVisible, setModalVisible, post }) => {
     const navigation = useNavigation();
-    const [title, setTitle] = useState("");
-    const [description, setDescription] = useState("");
+    const [caption, setCaption] = useState("");
     const [loading, setLoading] = useState(false);
 
     //handle update post
     const updatePostHandler = async (id) => {
         try {
             setLoading(true);
-            const { data } = await axios.put(`/post/update-post/${id}`, {
-                title,
-                description,
+            const token = await SecureStore.getItemAsync('authToken');
+            const { data } = await client.put(`/post/update-post/${id}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            }, {
+                caption,
             });
             setLoading(false);
             alert(data?.message);
@@ -29,8 +31,7 @@ const EditModal = ({ modalVisible, setModalVisible, post }) => {
 
     //inital post data\
     useEffect(() => {
-        setTitle(post?.title);
-        setDescription(post?.description);
+        setCaption(post?.caption);
     }, [post]);
     return (
         <View style={styles.centeredView}>
@@ -46,21 +47,13 @@ const EditModal = ({ modalVisible, setModalVisible, post }) => {
                 <View style={styles.centeredView}>
                     <View style={styles.modalView}>
                         <Text style={styles.modalText}>Update Your Posts</Text>
-                        <Text>Title</Text>
-                        <TextInput
-                            style={styles.inputBox}
-                            value={title}
-                            onChangeText={(text) => {
-                                setTitle(text);
-                            }}
-                        />
-                        <Text>Description</Text>
+                        <Text>Caption</Text>
                         <TextInput
                             style={styles.inputBox}
                             multiline={true}
                             numberOfLines={4}
-                            value={description}
-                            onChangeText={(text) => setDescription(text)}
+                            value={caption}
+                            onChangeText={(text) => setCaption(text)}
                         />
                         <View style={styles.btnContainer}>
                             <Pressable

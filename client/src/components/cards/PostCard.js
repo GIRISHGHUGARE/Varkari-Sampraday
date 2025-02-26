@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Text, View, StyleSheet, Alert, Image, TouchableOpacity, Modal } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Text, View, StyleSheet, Alert, Image, TouchableOpacity, Modal, Animated } from 'react-native';
 import moment from "moment";
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { useNavigation } from '@react-navigation/native';
@@ -12,7 +12,25 @@ const PostCard = ({ posts, myPostScreen }) => {
     const [post, setPost] = useState({});
     const [menuVisible, setMenuVisible] = useState(false);
     const [currentPostId, setCurrentPostId] = useState(null);
+    const [fadeAnim] = useState(new Animated.Value(0));  // for fade in animation
+    const [scaleAnim] = useState(new Animated.Value(0.7));  // for scale animation (initially small)
     const navigation = useNavigation();
+
+    useEffect(() => {
+        // Fade in and scale animation when component mounts
+        Animated.timing(fadeAnim, {
+            toValue: 1,
+            duration: 800,
+            useNativeDriver: true,
+        }).start();
+
+        Animated.spring(scaleAnim, {
+            toValue: 1,
+            friction: 3,
+            tension: 150,
+            useNativeDriver: true,
+        }).start();
+    }, []);
 
     const handleAlertDeletePost = (id) => {
         Alert.alert("Attention!", "Are you sure you want to delete the post?", [
@@ -41,100 +59,98 @@ const PostCard = ({ posts, myPostScreen }) => {
     };
 
     return (
-        <>
-            <View>
-                {myPostScreen && (
-                    <EditModal
-                        modalVisible={modalVisible}
-                        setModalVisible={setModalVisible}
-                        post={post}
-                    />
-                )}
-                {posts?.post.map((postItem, i) => (
-                    <View style={styles.card} key={i}>
-                        {/* User profile section */}
-                        <View style={styles.userSection}>
-                            <Image
-                                source={{ uri: postItem.postedByProfile || 'https://via.placeholder.com/50' }}
-                                style={styles.profileImage}
-                            />
-                            <View style={{ flex: 1 }}>
-                                <Text style={styles.userName}>{postItem.postedByName}</Text>
-                                <Text style={styles.date}>
-                                    {moment(postItem.createdAt).format("DD/MM/YYYY")}
-                                </Text>
-                            </View>
-                            {/* Vertical three dots menu */}
-                            <TouchableOpacity onPress={() => handleMenuToggle(postItem._id)}>
-                                <FontAwesome5 name="ellipsis-v" size={18} color="gray" />
-                            </TouchableOpacity>
+        <View>
+            {myPostScreen && (
+                <EditModal
+                    modalVisible={modalVisible}
+                    setModalVisible={setModalVisible}
+                    post={post}
+                />
+            )}
+            {posts?.post.map((postItem, i) => (
+                <Animated.View style={[styles.card, { opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]} key={i}>
+                    {/* User profile section */}
+                    <View style={styles.userSection}>
+                        <Image
+                            source={{ uri: postItem.postedByProfile || 'https://via.placeholder.com/50' }}
+                            style={styles.profileImage}
+                        />
+                        <View style={{ flex: 1 }}>
+                            <Text style={styles.userName}>{postItem.postedByName}</Text>
+                            <Text style={styles.date}>
+                                {moment(postItem.createdAt).format("DD/MM/YYYY")}
+                            </Text>
                         </View>
-
-                        {/* Menu Options */}
-                        {menuVisible && currentPostId === postItem._id && (
-                            <View style={styles.menu}>
-                                {myPostScreen ? (
-                                    <>
-                                        <TouchableOpacity
-                                            onPress={() => {
-                                                setPost(postItem);
-                                                setModalVisible(true);
-                                                setMenuVisible(false);
-                                            }}
-                                        >
-                                            <Text style={styles.menuItem}>Edit</Text>
-                                        </TouchableOpacity>
-                                        <TouchableOpacity
-                                            onPress={() => {
-                                                setMenuVisible(false);
-                                                handleAlertDeletePost(postItem._id);
-                                            }}
-                                        >
-                                            <Text style={styles.menuItem}>Delete</Text>
-                                        </TouchableOpacity>
-                                    </>
-                                ) : (
-                                    <>
-                                        <TouchableOpacity onPress={() => alert("Option 1")}>
-                                            <Text style={styles.menuItem}>Option 1</Text>
-                                        </TouchableOpacity>
-                                        <TouchableOpacity onPress={() => alert("Option 2")}>
-                                            <Text style={styles.menuItem}>Option 2</Text>
-                                        </TouchableOpacity>
-                                    </>
-                                )}
-                            </View>
-                        )}
-
-                        {/* Post details */}
-                        <Text style={styles.caption}>{postItem.caption}</Text>
-                        {postItem.uploadedPhoto && (
-                            <Image
-                                source={{ uri: postItem.uploadedPhoto }}
-                                style={styles.postImage}
-                                resizeMode="cover"
-                            />
-                        )}
-
-                        {/* Action buttons */}
-                        <View style={styles.actions}>
-                            <TouchableOpacity onPress={() => console.log(`Liked post ${postItem._id}`)} style={styles.actionButton}>
-                                <FontAwesome5 name="thumbs-up" size={20} color="blue" />
-                                <Text style={styles.actionText}>Like</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={() => console.log(`Comment post ${postItem._id}`)} style={styles.actionButton}>
-                                <FontAwesome5 name="comment" size={20} color="green" />
-                                <Text style={styles.actionText}>Comment</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={() => console.log(`Share post ${postItem._id}`)} style={styles.actionButton}>
-                                <FontAwesome5 name="share" size={20} color="purple" />
-                                <Text style={styles.actionText}>Share</Text>
-                            </TouchableOpacity>
-                        </View>
+                        {/* Vertical three dots menu */}
+                        <TouchableOpacity onPress={() => handleMenuToggle(postItem._id)}>
+                            <FontAwesome5 name="ellipsis-v" size={18} color="gray" />
+                        </TouchableOpacity>
                     </View>
-                ))}
-            </View>
-        </>
+
+                    {/* Menu Options */}
+                    {menuVisible && currentPostId === postItem._id && (
+                        <View style={styles.menu}>
+                            {myPostScreen ? (
+                                <>
+                                    <TouchableOpacity
+                                        onPress={() => {
+                                            setPost(postItem);
+                                            setModalVisible(true);
+                                            setMenuVisible(false);
+                                        }}
+                                    >
+                                        <Text style={styles.menuItem}>Edit</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        onPress={() => {
+                                            setMenuVisible(false);
+                                            handleAlertDeletePost(postItem._id);
+                                        }}
+                                    >
+                                        <Text style={styles.menuItem}>Delete</Text>
+                                    </TouchableOpacity>
+                                </>
+                            ) : (
+                                <>
+                                    <TouchableOpacity onPress={() => alert("Option 1")}>
+                                        <Text style={styles.menuItem}>Option 1</Text>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => alert("Option 2")}>
+                                        <Text style={styles.menuItem}>Option 2</Text>
+                                    </TouchableOpacity>
+                                </>
+                            )}
+                        </View>
+                    )}
+
+                    {/* Post details */}
+                    <Text style={styles.caption}>{postItem.caption}</Text>
+                    {postItem.uploadedPhoto && (
+                        <Animated.Image
+                            source={{ uri: postItem.uploadedPhoto }}
+                            style={[styles.postImage, { opacity: fadeAnim }]}
+                            resizeMode="cover"
+                        />
+                    )}
+
+                    {/* Action buttons */}
+                    <View style={styles.actions}>
+                        <TouchableOpacity onPress={() => console.log(`Liked post ${postItem._id}`)} style={styles.actionButton}>
+                            <FontAwesome5 name="thumbs-up" size={20} color="blue" />
+                            <Text style={styles.actionText}>Like</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => console.log(`Comment post ${postItem._id}`)} style={styles.actionButton}>
+                            <FontAwesome5 name="comment" size={20} color="green" />
+                            <Text style={styles.actionText}>Comment</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => console.log(`Share post ${postItem._id}`)} style={styles.actionButton}>
+                            <FontAwesome5 name="share" size={20} color="purple" />
+                            <Text style={styles.actionText}>Share</Text>
+                        </TouchableOpacity>
+                    </View>
+                </Animated.View>
+            ))}
+        </View>
     );
 };
 

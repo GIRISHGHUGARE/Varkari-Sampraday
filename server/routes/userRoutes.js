@@ -3,7 +3,7 @@ const express = require('express');
 const { validationResult } = require('express-validator');
 
 // FILES
-const { registerUser, verifyEmail, logout, loginUser, resendVerificationEmail, verifyUser, updateUser } = require('../controllers/userController');
+const { registerUser, verifyEmail, logout, loginUser, resendVerificationEmail, verifyUser, searchUser, updateUser } = require('../controllers/userController');
 const userValidationRules = require('../validations/userValidation');
 const loginValidationRules = require('../validations/loginValidation');
 const authenticate = require('../middlewares/authMiddleware');
@@ -25,6 +25,7 @@ router.post("/verify-email", authenticate, verifyEmail);
 router.post("/resend-otp", authenticate, resendVerificationEmail);
 router.post('/login', loginValidationRules, validate, loginUser);
 router.get('/verify-user', authenticate, verifyUser);
+router.post('/search-user', authenticate, searchUser);
 router.put("/update-user", authenticate, updateUser);
 router.delete("/logout", logout);
 

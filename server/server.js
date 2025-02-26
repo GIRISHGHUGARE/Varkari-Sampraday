@@ -75,7 +75,33 @@ io.on("connection", (socket) => {
             console.error("Error updating location:", err.message);
         }
     });
+    // Listen for "getLocation" event from clients (e.g., family member requesting a location)
+    socket.on('getLocation', async (userId) => {
+        try {
+            // Fetch the user's last known location from MongoDB (LiveTracker model)
+            const userLocation = await LiveTracker.findOne({ user: userId });
 
+            if (userLocation) {
+                // Emit the location to the requesting client
+                socket.emit("locationUpdated", {
+                    user: userId,
+                    currentLocation: userLocation.currentLocation
+                });
+
+                console.log(`Location sent for user ${userId}:`, userLocation.currentLocation);
+            } else {
+                // If no location found (e.g., user hasn't updated location yet)
+                socket.emit("locationUpdated", {
+                    user: userId,
+                    currentLocation: null
+                });
+
+                console.log(`No location found for user ${userId}`);
+            }
+        } catch (error) {
+            console.error("Error fetching location from database:", error);
+        }
+    });
     socket.on("disconnect", () => {
         console.log(`Client disconnected: ${socket.id}`);
     });

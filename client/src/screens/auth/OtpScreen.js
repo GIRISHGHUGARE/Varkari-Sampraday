@@ -87,17 +87,16 @@ const OtpScreen = () => {
         try {
             const token = await SecureStore.getItemAsync('authToken');
             // Replace with actual API call for OTP verification
-            const response = await client.post("/auth/resend-otp",
-                { headers: { Authorization: `Bearer ${token}` } } // Headers
-            );
-            console.log("Response:", response)
+            const response = await client.post("/auth/resend-otp", {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             if (response.data.success) {
                 Alert.alert("Success", "Otp resend successful!");
             } else {
                 Alert.alert("Error", "Please try again.");
             }
         } catch (error) {
-            Alert.alert("Error", error.response?.data?.message || "An error occurred. Please try again.");
+            Alert.alert("Error", error.response?.data?.message);
         } finally {
             setLoading(false);
         }
