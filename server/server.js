@@ -13,6 +13,7 @@ const connectDB = require('./config/db');
 const userRoutes = require("./routes/userRoutes")
 const postRoutes = require("./routes/postRoutes")
 const productRoutes = require("./routes/productRoutes")
+const storyRoutes = require("./routes/storyRoutes")
 const LiveTracker = require('./models/LiveTracker'); // Adjust the path as needed
 
 
@@ -119,6 +120,7 @@ app.get("", (req, res) => {
 app.use("/api/v1/auth", userRoutes)
 app.use("/api/v1/post", postRoutes)
 app.use("/api/v1/product", productRoutes)
+app.use("/api/v1/story", storyRoutes)
 
 // PORT
 const PORT = process.env.PORT || 8080;

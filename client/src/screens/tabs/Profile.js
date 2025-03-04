@@ -10,6 +10,7 @@ import PostCard from '../../components/cards/PostCard';
 import { useNavigation } from '@react-navigation/native';  // For navigation to "All Posts" screen
 import { fetchUserPosts } from '../../redux/features/post/userPostSlice';
 import FontAwesome6Icon from 'react-native-vector-icons/FontAwesome6';
+import Toast from 'react-native-toast-message';
 
 
 const Profile = () => {
@@ -121,7 +122,34 @@ const Profile = () => {
                 throw new Error('Failed to upload image');
             }
         } catch (error) {
-            Alert.alert('Error', 'Failed to upload the profile image');
+            Toast.show({
+                type: 'error',
+                position: 'Top', // Ensures the toast is in the center of the screen
+                text1: 'Cloudinary Error',
+                text2: 'Failed to upload the profile image',
+                visibilityTime: 3000, // Duration in milliseconds
+                autoHide: true, // Automatically hides after visibilityTime
+                topOffset: 50, // No top offset, as it's already centered
+                bottomOffset: 0, // No bottom offset, as it's already centered
+                style: {
+                    padding: 10,
+                    maxWidth: '80%', // Control max width
+                    borderRadius: 10,
+                },
+                text1Style: {
+                    fontSize: 16,
+                    fontWeight: 'bold',
+                    color: '#000', // Changed to white for better contrast
+                },
+                text2Style: {
+                    fontSize: 14,
+                    color: '#000', // Changed to white for better contrast
+                    flexWrap: 'wrap', // Allow text to wrap into multiple lines
+                    lineHeight: 20,   // Adjust line height for readability
+                    maxWidth: '80%',  // Control the max width of the toast
+                },
+            });
+            //Alert.alert('Error', 'Failed to upload the profile image');
         }
     };
 
@@ -136,10 +164,64 @@ const Profile = () => {
             );
             dispatch(setLoading(false));
             dispatch(login(data.user));
-            Alert.alert('Success', data.message);
+            Toast.show({
+                type: 'success',
+                position: 'top', // top, bottom, or center
+                text1: "Success",
+                text2: data.message,
+                visibilityTime: 3000, // Duration in milliseconds
+                autoHide: true, // Automatically hides after visibilityTime
+                topOffset: 110, // No top offset, as it's already centered
+                bottomOffset: 0, // No bottom offset, as it's already centered
+                style: {
+                    padding: 10,
+                    maxWidth: '80%', // Control max width
+                    borderRadius: 10,
+                },
+                text1Style: {
+                    fontSize: 16,
+                    fontWeight: 'bold',
+                    color: '#000', // Changed to white for better contrast
+                },
+                text2Style: {
+                    fontSize: 14,
+                    color: '#000', // Changed to white for better contrast
+                    flexWrap: 'wrap', // Allow text to wrap into multiple lines
+                    lineHeight: 20,   // Adjust line height for readability
+                    maxWidth: '80%',  // Control the max width of the toast
+                },
+            });
+            //Alert.alert('Success', data.message);
             setModalVisible(false);  // Close the modal after saving
         } catch (error) {
-            Alert.alert('Error', error.response?.data?.message || 'Failed to save profile changes');
+            Toast.show({
+                type: 'error',
+                position: 'Top', // Ensures the toast is in the center of the screen
+                text1: 'Server Error',
+                text2: 'Failed to save profile changes',
+                visibilityTime: 3000, // Duration in milliseconds
+                autoHide: true, // Automatically hides after visibilityTime
+                topOffset: 50, // No top offset, as it's already centered
+                bottomOffset: 0, // No bottom offset, as it's already centered
+                style: {
+                    padding: 10,
+                    maxWidth: '80%', // Control max width
+                    borderRadius: 10,
+                },
+                text1Style: {
+                    fontSize: 16,
+                    fontWeight: 'bold',
+                    color: '#000', // Changed to white for better contrast
+                },
+                text2Style: {
+                    fontSize: 14,
+                    color: '#000', // Changed to white for better contrast
+                    flexWrap: 'wrap', // Allow text to wrap into multiple lines
+                    lineHeight: 20,   // Adjust line height for readability
+                    maxWidth: '80%',  // Control the max width of the toast
+                },
+            });
+            //Alert.alert('Error', error.response?.data?.message || 'Failed to save profile changes');
             dispatch(setLoading(false));
         }
     };

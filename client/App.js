@@ -3,9 +3,11 @@ import { Provider } from 'react-redux';
 import { NavigationContainer } from '@react-navigation/native';
 import * as SplashScreen from 'expo-splash-screen';
 import { useFonts, Poppins_400Regular, Poppins_700Bold } from '@expo-google-fonts/poppins';
+import Toast from 'react-native-toast-message';
 import store from './src/redux/store.js';
 import RootNavigation from './src/navigation/RootNavigation.js';
 import './global.css';
+
 
 SplashScreen.preventAutoHideAsync();
 
@@ -30,6 +32,7 @@ export default function App() {
       <NavigationContainer>
         <RootNavigation />
       </NavigationContainer>
+      <Toast />
     </Provider>
   );
 }

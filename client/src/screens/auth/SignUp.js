@@ -10,6 +10,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from '@react-navigation/native';
 import * as SecureStore from 'expo-secure-store';
 import client from "../../lib/axios.js";
+import Toast from 'react-native-toast-message';
 
 const SignUp = () => {
     const navigation = useNavigation();
@@ -35,17 +36,100 @@ const SignUp = () => {
         dispatch(setError(null)); // Clear any previous errors
         try {
             if (!username || !password) {
-                Alert.alert("Validation Error", "Please fill in all fields.");
+                Toast.show({
+                    type: 'error',
+                    position: 'bottom', // top, bottom, or center
+                    text1: 'Validation Error',
+                    text2: 'Please fill in all fields.',
+                    visibilityTime: 3000, // Duration in milliseconds
+                    autoHide: true, // Automatically hides after visibilityTime
+                    topOffset: 0, // Distance from top (when position is top)
+                    bottomOffset: 40, // Distance from bottom (when position is bottom)
+                    style: {
+                        padding: 10,
+                        backgroundColor: 'red',
+                        maxWidth: '80%', // Control max width
+                        borderRadius: 10,
+                    },
+                    text1Style: {
+                        fontSize: 16,
+                        fontWeight: 'bold',
+                        color: '#000',
+                    },
+                    text2Style: {
+                        fontSize: 14,
+                        color: '#000',
+                        flexWrap: 'wrap', // Allow text to wrap into multiple lines
+                        lineHeight: 20,   // Adjust line height for readability
+                        maxWidth: '80%',  // Control the max width of the toast
+                    },
+                });
+                //Alert.alert("Validation Error", "Please fill in all fields.");
                 return;
             }
             const { data } = await client.post("/auth/register", { username, email, password });
             await SecureStore.setItemAsync('authToken', data.token);
             dispatch(login(data.user));
-            Alert.alert("Success", data.message);
+            Toast.show({
+                type: 'success',
+                position: 'top', // top, bottom, or center
+                text1: data.message,
+                text2: "Welcome to Varkari Sampraday !!",
+                visibilityTime: 3000, // Duration in milliseconds
+                autoHide: true, // Automatically hides after visibilityTime
+                topOffset: 110, // No top offset, as it's already centered
+                bottomOffset: 0, // No bottom offset, as it's already centered
+                style: {
+                    padding: 10,
+                    maxWidth: '80%', // Control max width
+                    borderRadius: 10,
+                },
+                text1Style: {
+                    fontSize: 16,
+                    fontWeight: 'bold',
+                    color: '#000', // Changed to white for better contrast
+                },
+                text2Style: {
+                    fontSize: 14,
+                    color: '#000', // Changed to white for better contrast
+                    flexWrap: 'wrap', // Allow text to wrap into multiple lines
+                    lineHeight: 20,   // Adjust line height for readability
+                    maxWidth: '80%',  // Control the max width of the toast
+                },
+            });
+            //Alert.alert("Success", data.message);
             navigation.navigate('OtpScreen');
         } catch (error) {
             dispatch(setError(error.response?.data?.message || "Register failed"));
-            Alert.alert("Register Failed", error.response?.data?.message || "Register failed");
+            Toast.show({
+                type: 'error',
+                position: 'bottom', // top, bottom, or center
+                text1: 'Username should be at least 3 characters',
+                text2: 'Password must be at least 6 characters',
+                visibilityTime: 3000, // Duration in milliseconds
+                autoHide: true, // Automatically hides after visibilityTime
+                topOffset: 0, // Distance from top (when position is top)
+                bottomOffset: 40, // Distance from bottom (when position is bottom)
+                style: {
+                    padding: 10,
+                    backgroundColor: 'red',
+                    maxWidth: '80%', // Control max width
+                    borderRadius: 10,
+                },
+                text1Style: {
+                    fontSize: 16,
+                    fontWeight: 'bold',
+                    color: '#000',
+                },
+                text2Style: {
+                    fontSize: 14,
+                    color: '#000',
+                    flexWrap: 'wrap', // Allow text to wrap into multiple lines
+                    lineHeight: 20,   // Adjust line height for readability
+                    maxWidth: '80%',  // Control the max width of the toast
+                },
+            });
+            //Alert.alert("Register Failed", error.response?.data?.message || "Register failed");
         } finally {
             dispatch(setLoading(false));
         }

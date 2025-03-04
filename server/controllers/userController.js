@@ -41,6 +41,7 @@ const registerUser = async (req, res) => {
             return res.status(500).json({ error: 'Error in sending verification email, please retry after some time!' });
         }
 
+
         // Create the user object after sending the email
         const user = new User({
             username,
@@ -48,6 +49,7 @@ const registerUser = async (req, res) => {
             password: hashedPassword,
             verificationToken,
             verificationTokenExpiresAt: Date.now() + OTP_EXPIRATION_TIME,
+            otpResendTimestamp: Date.now() + OTP_EXPIRATION_TIME,
         });
 
         // Save the user
@@ -103,6 +105,8 @@ const verifyEmail = async (req, res) => {
         user.isVerified = true;
         user.verificationToken = undefined;
         user.verificationTokenExpiresAt = undefined;
+        user.otpResendCount = undefined;
+        user.otpResendTimestamp = undefined;
         await user.save();
         return res.status(200).json({
             success: true,
@@ -159,7 +163,7 @@ const resendVerificationEmail = async (req, res) => {
 
                 return res.status(200).json({ message: "New OTP sent successfully" });
             } catch (error) {
-                return res.status(500).json({ error: error });
+                return res.status(500).json({ error: error, message: "Error in Sending Otp" });
             }
 
         } else {

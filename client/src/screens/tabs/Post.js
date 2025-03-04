@@ -7,6 +7,7 @@ import client from '../../lib/axios';
 import * as SecureStore from 'expo-secure-store';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { useNavigation } from '@react-navigation/native';
+import Toast from 'react-native-toast-message';
 
 const Post = () => {
     const dispatch = useDispatch();
@@ -43,7 +44,6 @@ const Post = () => {
 
             if (!result.canceled) {
                 const selectedImageUri = result.assets[0].uri;
-                console.log('Selected Image URI:', selectedImageUri);
                 setPostPhoto(selectedImageUri);
 
                 const uploadResponse = await uploadToCloudinary(selectedImageUri);
@@ -55,8 +55,33 @@ const Post = () => {
                 }
             }
         } catch (error) {
-            console.error('Photo selection error:', error);
-            Alert.alert('Error', 'Failed to select or upload the image.');
+            Toast.show({
+                type: 'error',
+                position: 'top', // Ensures the toast is in the center of the screen
+                text1: 'Error',
+                text2: 'Failed to select or upload the image.',
+                visibilityTime: 3000, // Duration in milliseconds
+                autoHide: true, // Automatically hides after visibilityTime
+                topOffset: 50, // No top offset, as it's already centered
+                bottomOffset: 0, // No bottom offset, as it's already centered
+                style: {
+                    padding: 10,
+                    maxWidth: '80%', // Control max width
+                    borderRadius: 10,
+                },
+                text1Style: {
+                    fontSize: 16,
+                    fontWeight: 'bold',
+                    color: '#000', // Changed to white for better contrast
+                },
+                text2Style: {
+                    fontSize: 14,
+                    color: '#000', // Changed to white for better contrast
+                    flexWrap: 'wrap', // Allow text to wrap into multiple lines
+                    lineHeight: 20,   // Adjust line height for readability
+                    maxWidth: '80%',  // Control the max width of the toast
+                },
+            });
         }
     };
 
@@ -83,8 +108,33 @@ const Post = () => {
                 throw new Error('Failed to upload image');
             }
         } catch (error) {
-            console.error('Cloudinary upload error:', error);
-            Alert.alert('Error', 'Failed to upload the post image');
+            Toast.show({
+                type: 'error',
+                position: 'top', // Ensures the toast is in the center of the screen
+                text1: 'Cloudinary Error',
+                text2: 'Failed to upload the post image',
+                visibilityTime: 3000, // Duration in milliseconds
+                autoHide: true, // Automatically hides after visibilityTime
+                topOffset: 50, // No top offset, as it's already centered
+                bottomOffset: 0, // No bottom offset, as it's already centered
+                style: {
+                    padding: 10,
+                    maxWidth: '80%', // Control max width
+                    borderRadius: 10,
+                },
+                text1Style: {
+                    fontSize: 16,
+                    fontWeight: 'bold',
+                    color: '#000', // Changed to white for better contrast
+                },
+                text2Style: {
+                    fontSize: 14,
+                    color: '#000', // Changed to white for better contrast
+                    flexWrap: 'wrap', // Allow text to wrap into multiple lines
+                    lineHeight: 20,   // Adjust line height for readability
+                    maxWidth: '80%',  // Control the max width of the toast
+                },
+            });
         }
     };
 
@@ -98,11 +148,65 @@ const Post = () => {
                 { headers: { Authorization: `Bearer ${token}` } }
             );
             dispatch(setLoading(false));
-            Alert.alert('Success', data.message);
+            Toast.show({
+                type: 'success',
+                position: 'top', // top, bottom, or center
+                text1: "Success",
+                text2: data.message,
+                visibilityTime: 3000, // Duration in milliseconds
+                autoHide: true, // Automatically hides after visibilityTime
+                topOffset: 110, // No top offset, as it's already centered
+                bottomOffset: 0, // No bottom offset, as it's already centered
+                style: {
+                    padding: 10,
+                    maxWidth: '80%', // Control max width
+                    borderRadius: 10,
+                },
+                text1Style: {
+                    fontSize: 16,
+                    fontWeight: 'bold',
+                    color: '#000', // Changed to white for better contrast
+                },
+                text2Style: {
+                    fontSize: 14,
+                    color: '#000', // Changed to white for better contrast
+                    flexWrap: 'wrap', // Allow text to wrap into multiple lines
+                    lineHeight: 20,   // Adjust line height for readability
+                    maxWidth: '80%',  // Control the max width of the toast
+                },
+            });
+            //Alert.alert('Success', data.message);
             navigation.navigate('Home')
         } catch (error) {
             dispatch(setLoading(false));
-            Alert.alert('Error', error.response?.data?.message || 'Failed to save post changes');
+            Toast.show({
+                type: 'error',
+                position: 'top', // Ensures the toast is in the center of the screen
+                text1: 'Server Error',
+                text2: 'Failed to save post changes',
+                visibilityTime: 3000, // Duration in milliseconds
+                autoHide: true, // Automatically hides after visibilityTime
+                topOffset: 50, // No top offset, as it's already centered
+                bottomOffset: 0, // No bottom offset, as it's already centered
+                style: {
+                    padding: 10,
+                    maxWidth: '80%', // Control max width
+                    borderRadius: 10,
+                },
+                text1Style: {
+                    fontSize: 16,
+                    fontWeight: 'bold',
+                    color: '#000', // Changed to white for better contrast
+                },
+                text2Style: {
+                    fontSize: 14,
+                    color: '#000', // Changed to white for better contrast
+                    flexWrap: 'wrap', // Allow text to wrap into multiple lines
+                    lineHeight: 20,   // Adjust line height for readability
+                    maxWidth: '80%',  // Control the max width of the toast
+                },
+            });
+            //Alert.alert('Error', error.response?.data?.message || 'Failed to save post changes');
         }
     };
 
@@ -149,7 +253,6 @@ const Post = () => {
                     {/* Selected Photo */}
                     {uploadedPhoto ? (
                         <View style={styles.selectedPhotoContainer}>
-                            {console.log('Uploaded Photo URI:', uploadedPhoto)}
                             <Image
                                 source={{ uri: uploadedPhoto }}
                                 style={styles.selectedPhoto}

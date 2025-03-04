@@ -7,6 +7,8 @@ import axios from "axios";
 import { useDispatch, useSelector } from 'react-redux';
 import * as SecureStore from 'expo-secure-store';
 import client from "../../lib/axios";
+import Toast from 'react-native-toast-message';
+
 const OtpScreen = () => {
     const email = useSelector(selectUserEmail);
     const [otp, setOtp] = useState(["", "", "", ""]); // State to store OTP digits
@@ -56,7 +58,35 @@ const OtpScreen = () => {
     const handleVerifyOtp = async () => {
         const otpString = otp.join('');
         if (otpString.length !== 4) {
-            Alert.alert("Error", "Please enter a valid 4-digit OTP");
+            Toast.show({
+                type: 'error',
+                position: 'top', // top, bottom, or center
+                text1: 'Validation Error',
+                text2: 'Please enter a valid 4-digit OTP',
+                visibilityTime: 3000, // Duration in milliseconds
+                autoHide: true, // Automatically hides after visibilityTime
+                topOffset: 50, // Distance from top (when position is top)
+                bottomOffset: 40, // Distance from bottom (when position is bottom)
+                style: {
+                    padding: 10,
+                    backgroundColor: 'red',
+                    maxWidth: '80%', // Control max width
+                    borderRadius: 10,
+                },
+                text1Style: {
+                    fontSize: 16,
+                    fontWeight: 'bold',
+                    color: '#000',
+                },
+                text2Style: {
+                    fontSize: 14,
+                    color: '#000',
+                    flexWrap: 'wrap', // Allow text to wrap into multiple lines
+                    lineHeight: 20,   // Adjust line height for readability
+                    maxWidth: '80%',  // Control the max width of the toast
+                },
+            });
+            //Alert.alert("Error", "Please enter a valid 4-digit OTP");
             return;
         }
 
@@ -69,13 +99,96 @@ const OtpScreen = () => {
                 { headers: { Authorization: `Bearer ${token}` } } // Headers
             );
             if (response.data.success) {
-                Alert.alert("Success", "OTP verified successfully! Please login!");
+                Toast.show({
+                    type: 'success',
+                    position: 'top', // top, bottom, or center
+                    text1: "Success",
+                    text2: "OTP verified successfully! Please login!",
+                    visibilityTime: 3000, // Duration in milliseconds
+                    autoHide: true, // Automatically hides after visibilityTime
+                    topOffset: 110, // No top offset, as it's already centered
+                    bottomOffset: 0, // No bottom offset, as it's already centered
+                    style: {
+                        padding: 10,
+                        maxWidth: '80%', // Control max width
+                        borderRadius: 10,
+                    },
+                    text1Style: {
+                        fontSize: 16,
+                        fontWeight: 'bold',
+                        color: '#000', // Changed to white for better contrast
+                    },
+                    text2Style: {
+                        fontSize: 14,
+                        color: '#000', // Changed to white for better contrast
+                        flexWrap: 'wrap', // Allow text to wrap into multiple lines
+                        lineHeight: 20,   // Adjust line height for readability
+                        maxWidth: '80%',  // Control the max width of the toast
+                    },
+                });
+                //Alert.alert("Success", "OTP verified successfully! Please login!");
                 navigation.navigate('Login'); // Redirect to home screen or wherever you'd like
             } else {
-                Alert.alert("Error", "Invalid OTP. Please try again.");
+                Toast.show({
+                    type: 'error',
+                    position: 'top', // top, bottom, or center
+                    text1: 'Error',
+                    text2: 'Invalid OTP. Please try again.',
+                    visibilityTime: 3000, // Duration in milliseconds
+                    autoHide: true, // Automatically hides after visibilityTime
+                    topOffset: 50, // Distance from top (when position is top)
+                    bottomOffset: 0, // Distance from bottom (when position is bottom)
+                    style: {
+                        padding: 10,
+                        backgroundColor: 'red',
+                        maxWidth: '80%', // Control max width
+                        borderRadius: 10,
+                    },
+                    text1Style: {
+                        fontSize: 16,
+                        fontWeight: 'bold',
+                        color: '#000',
+                    },
+                    text2Style: {
+                        fontSize: 14,
+                        color: '#000',
+                        flexWrap: 'wrap', // Allow text to wrap into multiple lines
+                        lineHeight: 20,   // Adjust line height for readability
+                        maxWidth: '80%',  // Control the max width of the toast
+                    },
+                });
+                //Alert.alert("Error", "Invalid OTP. Please try again.");
             }
         } catch (error) {
-            Alert.alert("Error", error.response?.data?.message || "An error occurred. Please try again.");
+            Toast.show({
+                type: 'error',
+                position: 'top', // top, bottom, or center
+                text1: 'Error',
+                text2: error.response?.data?.message,
+                visibilityTime: 3000, // Duration in milliseconds
+                autoHide: true, // Automatically hides after visibilityTime
+                topOffset: 50, // Distance from top (when position is top)
+                bottomOffset: 40, // Distance from bottom (when position is bottom)
+                style: {
+                    padding: 10,
+                    backgroundColor: 'red',
+                    maxWidth: '80%', // Control max width
+                    borderRadius: 10,
+                },
+                text1Style: {
+                    fontSize: 16,
+                    fontWeight: 'bold',
+                    color: '#000',
+                },
+                text2Style: {
+                    fontSize: 14,
+                    color: '#000',
+                    flexWrap: 'wrap', // Allow text to wrap into multiple lines
+                    lineHeight: 20,   // Adjust line height for readability
+                    maxWidth: '80%',  // Control the max width of the toast
+                },
+            });
+            //Alert.alert("Error", error.response?.data?.message || "An error occurred. Please try again.");
         } finally {
             setLoading(false);
         }
@@ -87,16 +200,131 @@ const OtpScreen = () => {
         try {
             const token = await SecureStore.getItemAsync('authToken');
             // Replace with actual API call for OTP verification
-            const response = await client.post("/auth/resend-otp", {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            if (response.data.success) {
-                Alert.alert("Success", "Otp resend successful!");
+            if (token) {
+                const headers = {
+                    Authorization: `Bearer ${token}`,
+                };
+
+                try {
+                    const response = await client.post("/auth/resend-otp", {}, { headers });
+                    console.log('Response:', response.data);
+                    Toast.show({
+                        type: 'success',
+                        position: 'top', // top, bottom, or center
+                        text1: "Success",
+                        text2: "Otp resend successful !!",
+                        visibilityTime: 3000, // Duration in milliseconds
+                        autoHide: true, // Automatically hides after visibilityTime
+                        topOffset: 110, // No top offset, as it's already centered
+                        bottomOffset: 0, // No bottom offset, as it's already centered
+                        style: {
+                            padding: 10,
+                            maxWidth: '80%', // Control max width
+                            borderRadius: 10,
+                        },
+                        text1Style: {
+                            fontSize: 16,
+                            fontWeight: 'bold',
+                            color: '#000', // Changed to white for better contrast
+                        },
+                        text2Style: {
+                            fontSize: 14,
+                            color: '#000', // Changed to white for better contrast
+                            flexWrap: 'wrap', // Allow text to wrap into multiple lines
+                            lineHeight: 20,   // Adjust line height for readability
+                            maxWidth: '80%',  // Control the max width of the toast
+                        },
+                    });
+                } catch (error) {
+                    Toast.show({
+                        type: 'error',
+                        position: 'top', // top, bottom, or center
+                        text1: 'Error in OTP Resend Request:',
+                        text2: "",
+                        visibilityTime: 3000, // Duration in milliseconds
+                        autoHide: true, // Automatically hides after visibilityTime
+                        topOffset: 50, // Distance from top (when position is top)
+                        bottomOffset: 40, // Distance from bottom (when position is bottom)
+                        style: {
+                            padding: 10,
+                            backgroundColor: 'red',
+                            maxWidth: '80%', // Control max width
+                            borderRadius: 10,
+                        },
+                        text1Style: {
+                            fontSize: 16,
+                            fontWeight: 'bold',
+                            color: '#000',
+                        },
+                        text2Style: {
+                            fontSize: 14,
+                            color: '#000',
+                            flexWrap: 'wrap', // Allow text to wrap into multiple lines
+                            lineHeight: 20,   // Adjust line height for readability
+                            maxWidth: '80%',  // Control the max width of the toast
+                        },
+                    });
+                }
             } else {
-                Alert.alert("Error", "Please try again.");
+                Toast.show({
+                    type: 'error',
+                    position: 'top', // top, bottom, or center
+                    text1: 'Token is missing!',
+                    text2: "",
+                    visibilityTime: 3000, // Duration in milliseconds
+                    autoHide: true, // Automatically hides after visibilityTime
+                    topOffset: 50, // Distance from top (when position is top)
+                    bottomOffset: 40, // Distance from bottom (when position is bottom)
+                    style: {
+                        padding: 10,
+                        backgroundColor: 'red',
+                        maxWidth: '80%', // Control max width
+                        borderRadius: 10,
+                    },
+                    text1Style: {
+                        fontSize: 16,
+                        fontWeight: 'bold',
+                        color: '#000',
+                    },
+                    text2Style: {
+                        fontSize: 14,
+                        color: '#000',
+                        flexWrap: 'wrap', // Allow text to wrap into multiple lines
+                        lineHeight: 20,   // Adjust line height for readability
+                        maxWidth: '80%',  // Control the max width of the toast
+                    },
+                });
             }
         } catch (error) {
-            Alert.alert("Error", error.response?.data?.message);
+            Toast.show({
+                type: 'error',
+                position: 'top', // top, bottom, or center
+                text1: 'Error',
+                text2: error.response?.data?.message,
+                visibilityTime: 3000, // Duration in milliseconds
+                autoHide: true, // Automatically hides after visibilityTime
+                topOffset: 50, // Distance from top (when position is top)
+                bottomOffset: 40, // Distance from bottom (when position is bottom)
+                style: {
+                    padding: 10,
+                    backgroundColor: 'red',
+                    maxWidth: '80%', // Control max width
+                    borderRadius: 10,
+                },
+                text1Style: {
+                    fontSize: 14,
+                    fontWeight: 'bold',
+                    color: '#000',
+                },
+                text2Style: {
+                    fontSize: 12,
+                    color: '#000',
+                    flexWrap: 'wrap', // Allow text to wrap into multiple lines
+                    lineHeight: 20,   // Adjust line height for readability
+                    maxWidth: '80%',  // Control the max width of the toast
+                },
+            });
+            // Alert.alert("Error", error.response?.data?.message);
         } finally {
             setLoading(false);
         }

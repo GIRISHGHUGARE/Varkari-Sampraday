@@ -5,14 +5,14 @@ const jwt = require('jsonwebtoken');
 const authenticate = (req, res, next) => {
     const token = req.headers['authorization']?.split(' ')[1]; // GET THE TOKEN FROM AUTHORIZATION HEADERS
     if (!token) {
-        return res.status(401).json({ msg: 'No token, authorization denied' });
+        return res.status(401).json({ message: 'No token, authorization denied' });
     }
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         req.user = decoded.user; // NOTE:- userId IS BEING PASSED AHEAD!!  
         next();
     } catch (err) {
-        return res.status(401).json({ msg: 'Token is not valid' });
+        return res.status(401).json({ message: 'Token is not valid' });
     }
 };
 

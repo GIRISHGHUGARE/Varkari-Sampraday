@@ -5,6 +5,10 @@ const storySchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    storyPhoto: {
+        type: String,
+        default: null,
+    },
     content: {
         type: String,
         required: true,

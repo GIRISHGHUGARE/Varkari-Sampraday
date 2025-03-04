@@ -10,6 +10,7 @@ import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
 import FontAwesome6Icon from 'react-native-vector-icons/FontAwesome6';
+import Toast from 'react-native-toast-message';
 
 // File imports
 import Home from "../screens/tabs/Home.js";
@@ -81,12 +82,66 @@ const CustomDrawerContent = (props) => {
         try {
             dispatch(login("")); // Clear login state
             await SecureStore.deleteItemAsync("authToken");
-            const data = await client.delete("/auth/logout");
-            Alert.alert("Success", data.message);
+            const response = await client.delete("/auth/logout");
+            Toast.show({
+                type: 'success',
+                position: 'bottom', // Ensures the toast is in the center of the screen
+                text1: 'Success',
+                text2: response.data.message,
+                visibilityTime: 3000, // Duration in milliseconds
+                autoHide: true, // Automatically hides after visibilityTime
+                topOffset: 0, // No top offset, as it's already centered
+                bottomOffset: 40, // No bottom offset, as it's already centered
+                style: {
+                    padding: 10,
+                    maxWidth: '80%', // Control max width
+                    borderRadius: 10,
+                },
+                text1Style: {
+                    fontSize: 16,
+                    fontWeight: 'bold',
+                    color: '#000', // Changed to white for better contrast
+                },
+                text2Style: {
+                    fontSize: 14,
+                    color: '#000', // Changed to white for better contrast
+                    flexWrap: 'wrap', // Allow text to wrap into multiple lines
+                    lineHeight: 20,   // Adjust line height for readability
+                    maxWidth: '80%',  // Control the max width of the toast
+                },
+            });
+            //Alert.alert("Success", response.data.message);
             navigation.navigate("Login");
         } catch (error) {
             console.error("Error in logout", error);
-            Alert.alert("Error", "Failed to logout");
+            Toast.show({
+                type: 'error',
+                position: 'top', // Ensures the toast is in the center of the screen
+                text1: 'Server Error',
+                text2: 'Failed to logout',
+                visibilityTime: 3000, // Duration in milliseconds
+                autoHide: true, // Automatically hides after visibilityTime
+                topOffset: 50, // No top offset, as it's already centered
+                bottomOffset: 0, // No bottom offset, as it's already centered
+                style: {
+                    padding: 10,
+                    maxWidth: '80%', // Control max width
+                    borderRadius: 10,
+                },
+                text1Style: {
+                    fontSize: 16,
+                    fontWeight: 'bold',
+                    color: '#000', // Changed to white for better contrast
+                },
+                text2Style: {
+                    fontSize: 14,
+                    color: '#000', // Changed to white for better contrast
+                    flexWrap: 'wrap', // Allow text to wrap into multiple lines
+                    lineHeight: 20,   // Adjust line height for readability
+                    maxWidth: '80%',  // Control the max width of the toast
+                },
+            });
+            //Alert.alert("Error", "Failed to logout");
         }
     };
 

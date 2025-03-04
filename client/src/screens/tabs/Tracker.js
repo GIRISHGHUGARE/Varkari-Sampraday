@@ -34,7 +34,6 @@ const TrackerScreen = () => {
         if (!role) return; // Wait for role selection before continuing
 
         if (role === "warkari") {
-            console.log("Warkari Role Selected");
 
             (async () => {
                 let { status } = await Location.requestForegroundPermissionsAsync();

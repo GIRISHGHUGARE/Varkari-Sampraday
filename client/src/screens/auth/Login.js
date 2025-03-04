@@ -9,6 +9,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from '@react-navigation/native';
 import * as SecureStore from 'expo-secure-store';
 import client from '../../lib/axios.js';
+import Toast from 'react-native-toast-message';
 
 const Login = () => {
     const navigation = useNavigation();
@@ -37,17 +38,98 @@ const Login = () => {
 
         try {
             if (!username || !password) {
-                Alert.alert("Validation Error", "Please fill in all fields.");
+                Toast.show({
+                    type: 'error',
+                    position: 'bottom', // Ensures the toast is in the center of the screen
+                    text1: 'Validation Error',
+                    text2: 'Please fill in all fields.',
+                    visibilityTime: 3000, // Duration in milliseconds
+                    autoHide: true, // Automatically hides after visibilityTime
+                    topOffset: 0, // No top offset, as it's already centered
+                    bottomOffset: 40, // No bottom offset, as it's already centered
+                    style: {
+                        padding: 10,
+                        maxWidth: '80%', // Control max width
+                        borderRadius: 10,
+                    },
+                    text1Style: {
+                        fontSize: 16,
+                        fontWeight: 'bold',
+                        color: '#000', // Changed to white for better contrast
+                    },
+                    text2Style: {
+                        fontSize: 14,
+                        color: '#000', // Changed to white for better contrast
+                        flexWrap: 'wrap', // Allow text to wrap into multiple lines
+                        lineHeight: 20,   // Adjust line height for readability
+                        maxWidth: '80%',  // Control the max width of the toast
+                    },
+                });
+                // Alert.alert("Validation Error", "Please fill in all fields.");
                 return;
             }
             const { data } = await client.post("/auth/login", { username, password });
             await SecureStore.setItemAsync('authToken', data.token);
             dispatch(login(data.user));
-            Alert.alert("Success", data.message);
+            Toast.show({
+                type: 'success',
+                position: 'top', // top, bottom, or center
+                text1: data.message,
+                text2: "Welcome Back !!",
+                visibilityTime: 3000, // Duration in milliseconds
+                autoHide: true, // Automatically hides after visibilityTime
+                topOffset: 110, // No top offset, as it's already centered
+                bottomOffset: 0, // No bottom offset, as it's already centered
+                style: {
+                    padding: 10,
+                    maxWidth: '80%', // Control max width
+                    borderRadius: 10,
+                },
+                text1Style: {
+                    fontSize: 16,
+                    fontWeight: 'bold',
+                    color: '#000', // Changed to white for better contrast
+                },
+                text2Style: {
+                    fontSize: 14,
+                    color: '#000', // Changed to white for better contrast
+                    flexWrap: 'wrap', // Allow text to wrap into multiple lines
+                    lineHeight: 20,   // Adjust line height for readability
+                    maxWidth: '80%',  // Control the max width of the toast
+                },
+            });
+            // Alert.alert("Success", data.message);
             navigation.navigate('Home');
         } catch (error) {
             dispatch(setError(error.response?.data?.message || "Login failed"));
-            Alert.alert("Login Failed", error.response?.data?.message || "Login failed");
+            Toast.show({
+                type: 'error',
+                position: 'bottom', // Ensures the toast is in the center of the screen
+                text1: 'Login Failed',
+                text2: 'Invalid Credentials',
+                visibilityTime: 3000, // Duration in milliseconds
+                autoHide: true, // Automatically hides after visibilityTime
+                topOffset: 0, // No top offset, as it's already centered
+                bottomOffset: 40, // No bottom offset, as it's already centered
+                style: {
+                    padding: 10,
+                    maxWidth: '80%', // Control max width
+                    borderRadius: 10,
+                },
+                text1Style: {
+                    fontSize: 16,
+                    fontWeight: 'bold',
+                    color: '#000', // Changed to white for better contrast
+                },
+                text2Style: {
+                    fontSize: 14,
+                    color: '#000', // Changed to white for better contrast
+                    flexWrap: 'wrap', // Allow text to wrap into multiple lines
+                    lineHeight: 20,   // Adjust line height for readability
+                    maxWidth: '80%',  // Control the max width of the toast
+                },
+            });
+            //Alert.alert("Login Failed", error.response?.data?.message || "Login failed");
         } finally {
             dispatch(setLoading(false));
         }
