@@ -29,7 +29,7 @@ const addStory = async (req, res) => {
     try {
         const userId = req.user;
         const user = await User.findById(userId);
-        const { title, content } = req.body;
+        const { title, storyPhoto, content } = req.body;
         if (user.isAdmin) {
             if (!title || !content) {
                 res.status(500).json({
@@ -39,6 +39,7 @@ const addStory = async (req, res) => {
             }
             const story = new Story({
                 title,
+                storyPhoto,
                 content
             });
             await story.save();
@@ -88,7 +89,7 @@ const updateStory = async (req, res) => {
         const userId = req.user;
         const user = await User.findById(userId);
         const { id } = req.params;
-        const { title, content } = req.body;
+        const { title, storyPhoto, content } = req.body;
         if (user.isAdmin) {
             const updatedStory = await Story.findByIdAndUpdate(
                 {
@@ -96,6 +97,7 @@ const updateStory = async (req, res) => {
                 },
                 {
                     title: title,
+                    storyPhoto: storyPhoto,
                     content: content,
                 },
                 {

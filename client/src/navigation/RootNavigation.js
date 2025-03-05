@@ -236,27 +236,8 @@ const DrawerNavigation = () => {
                 options={{
                     headerShown: true,
                     headerTitle: "",
-                    // headerTitle: () => (
-                    //     <View style={{ flexDirection: 'row', justifyContent: "center", alignItems: 'center', marginLeft: 10 }}>
-                    //         <TextInput
-                    //             placeholder="Search..."
-                    //             style={{
-                    //                 height: 40,
-                    //                 width: 200,
-                    //                 borderColor: 'gray',
-                    //                 borderWidth: 1,
-                    //                 borderRadius: 5,
-                    //                 paddingLeft: 10,
-                    //                 backgroundColor: 'white',
-                    //             }}
-                    //         />
-                    //     </View>
-                    // ),
                     headerRight: () => (
                         <View style={{ flexDirection: "row", justifyContent: "center", alignItems: 'center' }}>
-                            <TouchableOpacity onPress={() => console.log('Settings pressed')}>
-                                <MaterialIcons name="message" style={{ fontSize: 25, color: "black", marginRight: 15 }} />
-                            </TouchableOpacity>
                             <TouchableOpacity onPress={() => console.log('Settings pressed')}>
                                 <MaterialIcons name="settings" style={{ fontSize: 25, color: "black", marginRight: 20 }} />
                             </TouchableOpacity>
@@ -309,27 +290,8 @@ const DrawerNavigation = () => {
                     headerShown: true,
                     headerTitle: () => <AnimatedTitle title="Ram Krishna Hari !" />,
                     headerTitleAlign: "center",
-                    // headerTitle: () => (
-                    //     <View style={{ flexDirection: 'row', justifyContent: "center", alignItems: 'center', marginLeft: 10 }}>
-                    //         <TextInput
-                    //             placeholder="Search..."
-                    //             style={{
-                    //                 height: 40,
-                    //                 width: 200,
-                    //                 borderColor: 'gray',
-                    //                 borderWidth: 1,
-                    //                 borderRadius: 5,
-                    //                 paddingLeft: 10,
-                    //                 backgroundColor: 'white',
-                    //             }}
-                    //         />
-                    //     </View>
-                    // ),
                     headerRight: () => (
                         <View style={{ flexDirection: "row", justifyContent: "center", alignItems: 'center' }}>
-                            {/* <TouchableOpacity onPress={() => console.log('Settings pressed')}>
-                                <MaterialIcons name="message" style={{ fontSize: 25, color: "black", marginRight: 15 }} />
-                            </TouchableOpacity> */}
                             <TouchableOpacity onPress={() => console.log('Settings pressed')}>
                                 <MaterialIcons name="settings" style={{ fontSize: 25, color: "black", marginRight: 20 }} />
                             </TouchableOpacity>

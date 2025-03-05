@@ -14,10 +14,11 @@ const EditModal = ({ modalVisible, setModalVisible, post }) => {
         try {
             setLoading(true);
             const token = await SecureStore.getItemAsync('authToken');
+            console.log(token)
             const { data } = await client.put(`/post/update-post/${id}`, {
-                headers: { Authorization: `Bearer ${token}` }
-            }, {
                 caption,
+            }, {
+                headers: { Authorization: `Bearer ${token}` }
             });
             setLoading(false);
             alert(data?.message);

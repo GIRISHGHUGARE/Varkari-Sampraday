@@ -29,6 +29,7 @@ const Profile = () => {
     const [summary, setSummary] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
     const posts = useSelector((state) => state.userpost);
+    const recentPost = posts.post.length > 0 ? posts.post[0] : null;
 
     useEffect(() => {
         dispatch(fetchUserPosts());
