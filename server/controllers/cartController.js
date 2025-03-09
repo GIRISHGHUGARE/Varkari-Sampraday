@@ -1,6 +1,7 @@
-const Cart = require("../models/Cart");
-const Product = require("../models/Product");
-const User = require("../models/User");
+const Bill = require('../models/Bill');
+const Cart = require('../models/Cart');
+const Product = require('../models/Product');
+const User = require('../models/User');
 
 // Get user's cart
 const getCart = async (req, res) => {
@@ -218,4 +219,119 @@ const getBill = async (req, res) => {
 };
 
 
-module.exports = { getCart, addToCart, removeFromCart, updateCart, getBill };
+const getPlacedBill = async (req, res) => {
+    try {
+        const userId = req.user; // User is assumed to be added to the request by authenticate middleware
+        const bill = await Bill.findOne({ user: userId }).sort({ createdAt: -1 }).limit(1)
+
+        res.status(200).json({
+            success: true,
+            message: "Bill generated successfully!",
+            bill
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Server error!"
+        });
+    }
+};
+
+// Create Bill (Place Order)
+const createBill = async (req, res) => {
+    try {
+        const userId = req.user; // User info will be fetched from middleware (after authentication)
+        const { shippingAddress, mobile } = req.body;
+
+        // Fetch user's cart
+        const cart = await Cart.findOne({ user: userId }).populate('products.product');
+        if (!cart || cart.products.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Cart is empty. Cannot place an order!"
+            });
+        }
+
+        // Calculate total amount, taxes, shipping fee, etc.
+        let totalAmount = 0;
+        cart.products.forEach(item => {
+            totalAmount += item.quantity * item.price;
+        });
+
+        const taxes = totalAmount * 0.1; // Assume 10% taxes
+        const shippingFee = 50; // You can calculate this based on the address or other logic
+
+        const finalTotal = totalAmount + taxes + shippingFee;
+
+        // Create a new bill
+        const bill = new Bill({
+            user: userId,
+            cart: cart._id,
+            items: cart.products.map(item => ({
+                product: item.product._id,
+                quantity: item.quantity,
+                price: item.price,
+                total: item.quantity * item.price
+            })),
+            totalAmount: finalTotal,
+            taxes,
+            shippingFee,
+            shippingAddress,
+            mobile,
+            status: 'pending' // Mark the order as pending initially
+        });
+
+        await bill.save();
+
+        // Optional: You may want to clear the cart after the order is placed
+        cart.products = [];
+        await cart.save();
+
+        res.status(201).json({
+            success: true,
+            message: 'Order placed successfully!',
+            bill,
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            success: false,
+            message: 'Server error!',
+        });
+    }
+};
+
+// Delete Bill (Cancel Order)
+const deleteBill = async (req, res) => {
+    try {
+        const { billId } = req.params; // Get bill ID from request params
+
+        const bill = await Bill.findById(billId);
+        if (!bill) {
+            return res.status(404).json({
+                success: false,
+                message: 'Bill not found!'
+            });
+        }
+        // await Bill.findByIdAndDelete(billId);
+        // Mark the bill as canceled
+        bill.status = 'canceled';
+        await bill.save();
+
+        res.status(200).json({
+            success: true,
+            message: 'Order canceled successfully!',
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            success: false,
+            message: 'Server error!',
+        });
+    }
+};
+
+
+module.exports = { getCart, addToCart, removeFromCart, updateCart, getBill, createBill, deleteBill, getPlacedBill };
