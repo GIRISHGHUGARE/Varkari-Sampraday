@@ -207,7 +207,8 @@ const loginUser = async (req, res) => {
                 email: user.email,
                 profilePhoto: user.profilePhoto,
                 summary: user.summary,
-                isVerified: user.isVerified
+                isVerified: user.isVerified,
+                isAdmin: user.isAdmin
             }
         });
     } catch (error) {
@@ -237,7 +238,8 @@ const verifyUser = async (req, res) => {
                 email: user.email,
                 profilePhoto: user.profilePhoto,
                 summary: user.summary,
-                isVerified: user.isVerified
+                isVerified: user.isVerified,
+                isAdmin: user.isAdmin
             }
         });
     } catch (error) {

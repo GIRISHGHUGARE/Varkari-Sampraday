@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TextInput, Button, StyleSheet, Alert, TouchableOpacity, ScrollView, Modal } from 'react-native';
+import { View, Text, Image, TextInput, Button, StyleSheet, Alert, TouchableOpacity, ScrollView, Modal, RefreshControl } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useDispatch, useSelector } from 'react-redux';
 import { login, selectUserSummary, selectUser, setLoading, selectUserProfilePhoto } from '../../redux/features/auth/authSlice';
@@ -30,7 +30,7 @@ const Profile = () => {
     const [modalVisible, setModalVisible] = useState(false);
     const posts = useSelector((state) => state.userpost);
     const recentPost = posts.post.length > 0 ? posts.post[0] : null;
-
+    const [refreshing, setRefreshing] = useState(false);
     useEffect(() => {
         dispatch(fetchUserPosts());
     }, [dispatch]);
@@ -226,14 +226,18 @@ const Profile = () => {
             dispatch(setLoading(false));
         }
     };
-
+    const handleRefresh = async () => {
+        setRefreshing(true);
+        await dispatch(fetchUserPosts());
+        setRefreshing(false);
+    };
     // Handle navigation to all posts page
     const handleShowAllPosts = () => {
         navigation.navigate('AllPosts'); // Navigate to the "AllPosts" screen
     };
 
     return (
-        <ScrollView contentContainerStyle={styles.container}>
+        <ScrollView contentContainerStyle={styles.container} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}>
             <View style={styles.headerSection}>
                 <View style={styles.header}>
                     <TouchableOpacity onPress={handleSelectPhoto} style={styles.imageContainer}>
@@ -262,12 +266,12 @@ const Profile = () => {
             <View style={styles.activitySection}>
                 <Text style={styles.activityTitle}>Activity</Text>
                 <PostCard posts={posts} myPostScreen={true} />
-                <TouchableOpacity onPress={handleShowAllPosts}>
+                {/* <TouchableOpacity onPress={handleShowAllPosts}>
                     <View style={styles.showAllPostsButton}>
                         <Text style={styles.showAllPostsButtonText}>Show All Posts</Text>
                         <FontAwesome6Icon name="arrow-right" size={18} color="gray" />
                     </View>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
             </View>
 
             {/* Edit Profile Modal */}

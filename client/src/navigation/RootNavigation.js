@@ -25,6 +25,7 @@ import client from '../lib/axios.js';
 import Story from '../screens/tabs/Story.js';
 import Cart from '../screens/tabs/Cart.js';
 import Payment from '../screens/tabs/Payment.js';
+import StoryDetail from '../screens/tabs/StoryDetail.js';
 
 
 // Create navigators
@@ -368,6 +369,7 @@ const RootNavigation = () => {
                     <Stack.Screen name="Product" component={DrawerNavigation} options={{ headerShown: false }} />
                     <Stack.Screen name="Story" component={DrawerNavigation} options={{ headerShown: false }} />
                     <Stack.Screen name="Profile" component={DrawerNavigation} options={{ headerShown: false }} />
+                    <Stack.Screen name="StoryDetail" component={StoryDetail} options={{ headerShown: false }} />
                     <Stack.Screen name="Cart" component={Cart} options={{ headerShown: false }} />
                     <Stack.Screen name="Payment" component={Payment} options={{ headerShown: false }} />
                 </>

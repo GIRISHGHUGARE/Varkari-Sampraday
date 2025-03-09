@@ -82,9 +82,11 @@ const PostCard = ({ posts, myPostScreen }) => {
                             </Text>
                         </View>
                         {/* Vertical three dots menu */}
-                        <TouchableOpacity onPress={() => handleMenuToggle(postItem._id)}>
-                            <FontAwesome5 name="ellipsis-v" size={18} color="gray" />
-                        </TouchableOpacity>
+                        {myPostScreen && (
+                            <TouchableOpacity onPress={() => handleMenuToggle(postItem._id)}>
+                                <FontAwesome5 name="ellipsis-v" size={18} color="gray" />
+                            </TouchableOpacity>
+                        )}
                     </View>
 
                     {/* Menu Options */}
@@ -134,7 +136,7 @@ const PostCard = ({ posts, myPostScreen }) => {
                     )}
 
                     {/* Action buttons */}
-                    <View style={styles.actions}>
+                    {/* <View style={styles.actions}>
                         <TouchableOpacity onPress={() => console.log(`Liked post ${postItem._id}`)} style={styles.actionButton}>
                             <FontAwesome5 name="thumbs-up" size={20} color="blue" />
                             <Text style={styles.actionText}>Like</Text>
@@ -147,7 +149,7 @@ const PostCard = ({ posts, myPostScreen }) => {
                             <FontAwesome5 name="share" size={20} color="purple" />
                             <Text style={styles.actionText}>Share</Text>
                         </TouchableOpacity>
-                    </View>
+                    </View> */}
                 </Animated.View>
             ))}
         </View>
