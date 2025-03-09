@@ -3,6 +3,7 @@ import { authSlice } from "./features/auth/authSlice";
 import { postSlice } from "./features/post/postSlice";
 import { userPostSlice } from "./features/post/userPostSlice";
 import { productSlice } from "./features/product/productSlice";
+import { cartSlice } from "./features/cart/cartSlice";
 
 const store = configureStore({
     reducer: {
@@ -10,6 +11,7 @@ const store = configureStore({
         post: postSlice.reducer,
         userpost: userPostSlice.reducer,
         product: productSlice.reducer,
+        cart: cartSlice.reducer
     }
 });
 

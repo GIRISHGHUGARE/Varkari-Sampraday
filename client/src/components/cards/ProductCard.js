@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Text, View, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
-import { useNavigation } from '@react-navigation/native';
+import { useDispatch } from 'react-redux';
+import { addToCart } from '../../redux/features/cart/cartSlice';
 
 const ProductCard = ({ products }) => {
-    const [product, setProduct] = useState({});
-    const [currentPostId, setCurrentPostId] = useState(null);
-    const navigation = useNavigation();
+    const dispatch = useDispatch();
 
+    const handleAddToCart = (productId) => {
+        // Dispatch the action to add the product to the cart
+        dispatch(addToCart(productId));
+    };
     return (
         <ScrollView contentContainerStyle={styles.cardContainer}>
             {products?.product.map((postItem, i) => (
@@ -35,7 +38,9 @@ const ProductCard = ({ products }) => {
 
                     {/* Action Buttons */}
                     <View style={styles.actions}>
-                        <TouchableOpacity onPress={() => console.log(`Add ${postItem.name} to cart`)} style={styles.actionButton}>
+                        <TouchableOpacity
+                            onPress={() => handleAddToCart(postItem._id)} // Add product to cart
+                            style={styles.actionButton}>
                             <FontAwesome5 name="shopping-cart" size={20} color="#fff" />
                             <Text style={styles.actionText}>Add to Cart</Text>
                         </TouchableOpacity>

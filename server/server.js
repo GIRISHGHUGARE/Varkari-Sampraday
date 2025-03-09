@@ -10,11 +10,12 @@ const http = require("http");
 
 // FILES
 const connectDB = require('./config/db');
-const userRoutes = require("./routes/userRoutes")
-const postRoutes = require("./routes/postRoutes")
-const productRoutes = require("./routes/productRoutes")
-const storyRoutes = require("./routes/storyRoutes")
-const LiveTracker = require('./models/LiveTracker'); // Adjust the path as needed
+const userRoutes = require("./routes/userRoutes");
+const postRoutes = require("./routes/postRoutes");
+const productRoutes = require("./routes/productRoutes");
+const storyRoutes = require("./routes/storyRoutes");
+const cartRoutes = require('./routes/cartRoutes');
+const LiveTracker = require('./models/LiveTracker');
 
 
 // DOTENV
@@ -121,6 +122,7 @@ app.use("/api/v1/auth", userRoutes)
 app.use("/api/v1/post", postRoutes)
 app.use("/api/v1/product", productRoutes)
 app.use("/api/v1/story", storyRoutes)
+app.use("/api/v1/cart", cartRoutes)
 
 // PORT
 const PORT = process.env.PORT || 8080;

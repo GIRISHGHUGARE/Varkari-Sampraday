@@ -23,10 +23,14 @@ import SignUp from "../screens/auth/SignUp.js";
 import OtpScreen from '../screens/auth/OtpScreen.js';
 import client from '../lib/axios.js';
 import Story from '../screens/tabs/Story.js';
+import Cart from '../screens/tabs/Cart.js';
+import Payment from '../screens/tabs/Payment.js';
+
 
 // Create navigators
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
+
 
 
 const AnimatedTitle = ({ title }) => {
@@ -169,6 +173,7 @@ const CustomDrawerContent = (props) => {
 };
 const DrawerNavigation = () => {
     const profilePhoto = useSelector((state) => state.auth.user.profilePhoto)
+    const navigation = useNavigation();
     return (
         <Drawer.Navigator
             drawerContent={(props) => <CustomDrawerContent {...props} />}
@@ -201,22 +206,6 @@ const DrawerNavigation = () => {
                     headerShown: true,
                     headerTitle: () => <AnimatedTitle title="Jai Hari Mauli !" />,
                     headerTitleAlign: "center",
-                    // headerTitle: () => (
-                    //     <View style={{ flexDirection: 'row', justifyContent: "center", alignItems: 'center', marginLeft: 10 }}>
-                    //         <TextInput
-                    //             placeholder="Search..."
-                    //             style={{
-                    //                 height: 40,
-                    //                 width: 200,
-                    //                 borderColor: 'gray',
-                    //                 borderWidth: 1,
-                    //                 borderRadius: 5,
-                    //                 paddingLeft: 10,
-                    //                 backgroundColor: 'white',
-                    //             }}
-                    //         />
-                    //     </View>
-                    // ),
                     headerRight: () => (
                         <View style={{ flexDirection: "row", justifyContent: "center", alignItems: 'center' }}>
                             {/* <TouchableOpacity onPress={() => console.log('Settings pressed')}>
@@ -273,11 +262,13 @@ const DrawerNavigation = () => {
                     headerTitleAlign: "center",
                     headerRight: () => (
                         <View style={{ flexDirection: "row", justifyContent: "center", alignItems: 'center' }}>
-                            {/* <TouchableOpacity onPress={() => console.log('Settings pressed')}>
-                                <MaterialIcons name="message" style={{ fontSize: 25, color: "black", marginRight: 15 }} />
-                            </TouchableOpacity> */}
-                            <TouchableOpacity onPress={() => console.log('Settings pressed')}>
-                                <MaterialIcons name="settings" style={{ fontSize: 25, color: "black", marginRight: 20 }} />
+                            <TouchableOpacity
+                                onPress={() => navigation.navigate('Cart')} // Navigate to Cart screen when pressed
+                            >
+                                <MaterialIcons
+                                    name="shopping-cart"
+                                    style={{ fontSize: 25, color: "black", marginRight: 20 }}
+                                />
                             </TouchableOpacity>
                         </View>
                     ),
@@ -286,6 +277,22 @@ const DrawerNavigation = () => {
             <Drawer.Screen
                 name="Profile"
                 component={Profile}
+                options={{
+                    headerShown: true,
+                    headerTitle: () => <AnimatedTitle title="Ram Krishna Hari !" />,
+                    headerTitleAlign: "center",
+                    headerRight: () => (
+                        <View style={{ flexDirection: "row", justifyContent: "center", alignItems: 'center' }}>
+                            <TouchableOpacity onPress={() => console.log('Settings pressed')}>
+                                <MaterialIcons name="settings" style={{ fontSize: 25, color: "black", marginRight: 20 }} />
+                            </TouchableOpacity>
+                        </View>
+                    ),
+                }}
+            />
+            <Drawer.Screen
+                name="Cart"
+                component={Cart}
                 options={{
                     headerShown: true,
                     headerTitle: () => <AnimatedTitle title="Ram Krishna Hari !" />,
@@ -361,6 +368,8 @@ const RootNavigation = () => {
                     <Stack.Screen name="Product" component={DrawerNavigation} options={{ headerShown: false }} />
                     <Stack.Screen name="Story" component={DrawerNavigation} options={{ headerShown: false }} />
                     <Stack.Screen name="Profile" component={DrawerNavigation} options={{ headerShown: false }} />
+                    <Stack.Screen name="Cart" component={Cart} options={{ headerShown: false }} />
+                    <Stack.Screen name="Payment" component={Payment} options={{ headerShown: false }} />
                 </>
             ) : (
                 <>

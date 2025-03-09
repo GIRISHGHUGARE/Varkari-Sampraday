@@ -5,7 +5,7 @@ import * as Location from "expo-location";
 import { io } from "socket.io-client";
 import { useSelector } from "react-redux";
 
-const socket = io("http://ip:8080"); // Replace with your backend URL
+const socket = io("http://ip:8080/"); // Replace with your backend URL
 
 const TrackerScreen = () => {
     const [location, setLocation] = useState(null);

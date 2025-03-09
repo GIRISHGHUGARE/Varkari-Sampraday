@@ -3,8 +3,6 @@ import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet, Animated, Ac
 import { useNavigation } from '@react-navigation/native';
 import * as SecureStore from 'expo-secure-store';
 import client from '../../lib/axios';
-import moment from 'moment';
-import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import RootTab from '../../navigation/Tabs/RootTab';
 
 const Story = () => {
@@ -71,7 +69,9 @@ const Story = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: '#f8f8f8',
+    },
+    storyContainer: {
         padding: 10,
     },
     card: {
