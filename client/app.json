@@ -19,7 +19,11 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.girish.g.client"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -36,10 +40,15 @@
         "expo-font",
         {
           "fonts": [
-            "node_modules/@expo-google-fonts/inter/Poppins_400Regular.ttf"
+            "node_modules/@expo-google-fonts/poppins/Poppins_400Regular.ttf"
           ]
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "17e2728d-a718-4d29-be67-c1388b982915"
+      }
+    }
   }
 }

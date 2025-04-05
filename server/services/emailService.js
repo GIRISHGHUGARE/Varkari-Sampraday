@@ -29,4 +29,31 @@ const sendVerificationEmail = async ({ email, verificationToken }) => {
     }
 };
 
-module.exports = { sendVerificationEmail };
+const sendResetSuccessEmail = async ({ email }) => {
+    const transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 587,
+        secure: false, // true for port 465, false for other ports
+        auth: {
+            user: process.env.USER,
+            pass: process.env.APP_PASSWORD,
+        },
+    });
+
+    async function main() {
+        const info = await transporter.sendMail({
+            from: "Varkari Sampraday", // sender address
+            to: email, // list of receivers
+            subject: "Verify your email", // Subject line
+            html: PASSWORD_RESET_SUCCESS_TEMPLATE // html body
+        });
+
+        console.log("Message sent: %s", info.messageId);
+    }
+    try {
+        await main();
+    } catch (error) {
+        console.error("Error sending email:", error);
+    }
+};
+module.exports = { sendVerificationEmail, sendResetSuccessEmail };

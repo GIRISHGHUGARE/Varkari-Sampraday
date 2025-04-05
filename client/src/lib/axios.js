@@ -2,7 +2,8 @@
 import axios from 'axios';
 
 const client = axios.create({
-    baseURL: 'http://ip:8080/api/v1',
+    // baseURL: 'https://varkari-sampraday.onrender.com/api/v1',
+    baseURL: 'http://192.168.0.109:8080/api/v1',
     headers: {
         'Content-Type': 'application/json',  // Ensure proper content type
     }

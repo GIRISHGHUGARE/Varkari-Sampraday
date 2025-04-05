@@ -9,6 +9,7 @@ import RootNavigation from './src/navigation/RootNavigation.js';
 import './global.css';
 
 
+
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
@@ -28,11 +29,13 @@ export default function App() {
   }
 
   return (
+
     <Provider store={store}>
       <NavigationContainer>
         <RootNavigation />
       </NavigationContainer>
       <Toast />
     </Provider>
+
   );
 }

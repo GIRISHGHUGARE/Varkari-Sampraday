@@ -15,6 +15,7 @@ const postRoutes = require("./routes/postRoutes");
 const productRoutes = require("./routes/productRoutes");
 const storyRoutes = require("./routes/storyRoutes");
 const cartRoutes = require('./routes/cartRoutes');
+const adminRoutes = require('./routes/adminRoutes')
 const LiveTracker = require('./models/LiveTracker');
 
 
@@ -36,8 +37,8 @@ const io = new Server(server, {
 
 // MIDDLEWARES
 const corsOptions = {
-    origin: 'http://192.168.0.112:8081',
-    methods: ['GET', 'POST'],
+    origin: 'http://localhost:5173',
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     allowedHeaders: ['Authorization', 'Content-Type'],
 };
 app.use(cors(corsOptions));
@@ -119,6 +120,7 @@ app.get("", (req, res) => {
 
 // OTHER ROUTES
 app.use("/api/v1/auth", userRoutes)
+app.use("/api/v1/admin", adminRoutes)
 app.use("/api/v1/post", postRoutes)
 app.use("/api/v1/product", productRoutes)
 app.use("/api/v1/story", storyRoutes)
