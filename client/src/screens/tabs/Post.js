@@ -96,7 +96,7 @@ const Post = () => {
             formData.append('upload_preset', 'post_pictures');
             formData.append('unsigned', 'true');
 
-            const response = await fetch(`https://api.cloudinary.com/v1_1/cloud/image/upload`, {
+            const response = await fetch(`https://api.cloudinary.com/v1_1/dtxcatfdq/image/upload`, {
                 method: 'POST',
                 body: formData,
             });

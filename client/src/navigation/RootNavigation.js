@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, TouchableOpacity, Alert, TextInput, StyleSheet, Text, Image, Animated } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, Text, Image, Animated } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
 import { useSelector, useDispatch } from 'react-redux';
 import * as SecureStore from 'expo-secure-store';
 import { login, setLoading, setError } from '../redux/features/auth/authSlice.js';
 import { selectUser, selectIsVerified } from '../redux/features/auth/authSlice.js';
-import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
 import FontAwesome6Icon from 'react-native-vector-icons/FontAwesome6';
@@ -18,6 +17,7 @@ import Tracker from "../screens/tabs/Tracker.js";
 import Post from "../screens/tabs/Post.js";
 import Product from "../screens/tabs/Product.js";
 import Profile from "../screens/tabs/Profile.js";
+import Settings from "../screens/tabs/Settings.js";
 import Login from "../screens/auth/Login.js";
 import SignUp from "../screens/auth/SignUp.js";
 import OtpScreen from '../screens/auth/OtpScreen.js';
@@ -26,7 +26,7 @@ import Story from '../screens/tabs/Story.js';
 import Cart from '../screens/tabs/Cart.js';
 import Payment from '../screens/tabs/Payment.js';
 import StoryDetail from '../screens/tabs/StoryDetail.js';
-
+import ForgotPassword from '../screens/auth/ForgotPassword.js';
 
 // Create navigators
 const Stack = createNativeStackNavigator();
@@ -66,9 +66,9 @@ const AnimatedTitle = ({ title }) => {
                     key={index}
                     style={{
                         opacity: letterAnimations[index],
-                        fontSize: 24,  // Adjust the font size as needed
-                        fontWeight: 'bold',  // Make the text bold
-                        color: 'black',  // You can change the color
+                        fontSize: 24,
+                        fontWeight: 'bold',
+                        color: 'black',
                     }}
                 >
                     {letter}
@@ -115,7 +115,6 @@ const CustomDrawerContent = (props) => {
                     maxWidth: '80%',  // Control the max width of the toast
                 },
             });
-            //Alert.alert("Success", response.data.message);
             navigation.navigate("Login");
         } catch (error) {
             console.error("Error in logout", error);
@@ -146,7 +145,6 @@ const CustomDrawerContent = (props) => {
                     maxWidth: '80%',  // Control the max width of the toast
                 },
             });
-            //Alert.alert("Error", "Failed to logout");
         }
     };
 
@@ -209,10 +207,7 @@ const DrawerNavigation = () => {
                     headerTitleAlign: "center",
                     headerRight: () => (
                         <View style={{ flexDirection: "row", justifyContent: "center", alignItems: 'center' }}>
-                            {/* <TouchableOpacity onPress={() => console.log('Settings pressed')}>
-                                <MaterialIcons name="message" style={{ fontSize: 25, color: "black", marginRight: 15 }} />
-                            </TouchableOpacity> */}
-                            <TouchableOpacity onPress={() => console.log('Settings pressed')}>
+                            <TouchableOpacity onPress={() => navigation.navigate("Settings")}>
                                 <MaterialIcons name="settings" style={{ fontSize: 25, color: "black", marginRight: 20 }} />
                             </TouchableOpacity>
                         </View>
@@ -228,7 +223,7 @@ const DrawerNavigation = () => {
                     headerTitle: "",
                     headerRight: () => (
                         <View style={{ flexDirection: "row", justifyContent: "center", alignItems: 'center' }}>
-                            <TouchableOpacity onPress={() => console.log('Settings pressed')}>
+                            <TouchableOpacity onPress={() => navigation.navigate("Settings")}>
                                 <MaterialIcons name="settings" style={{ fontSize: 25, color: "black", marginRight: 20 }} />
                             </TouchableOpacity>
                         </View>
@@ -244,10 +239,7 @@ const DrawerNavigation = () => {
                     headerTitleAlign: "center",
                     headerRight: () => (
                         <View style={{ flexDirection: "row", justifyContent: "center", alignItems: 'center' }}>
-                            {/* <TouchableOpacity onPress={() => console.log('Settings pressed')}>
-                                <MaterialIcons name="message" style={{ fontSize: 25, color: "black", marginRight: 15 }} />
-                            </TouchableOpacity> */}
-                            <TouchableOpacity onPress={() => console.log('Settings pressed')}>
+                            <TouchableOpacity onPress={() => navigation.navigate("Settings")}>
                                 <MaterialIcons name="settings" style={{ fontSize: 25, color: "black", marginRight: 20 }} />
                             </TouchableOpacity>
                         </View>
@@ -300,7 +292,7 @@ const DrawerNavigation = () => {
                     headerTitleAlign: "center",
                     headerRight: () => (
                         <View style={{ flexDirection: "row", justifyContent: "center", alignItems: 'center' }}>
-                            <TouchableOpacity onPress={() => console.log('Settings pressed')}>
+                            <TouchableOpacity onPress={() => navigation.navigate("Settings")}>
                                 <MaterialIcons name="settings" style={{ fontSize: 25, color: "black", marginRight: 20 }} />
                             </TouchableOpacity>
                         </View>
@@ -372,12 +364,14 @@ const RootNavigation = () => {
                     <Stack.Screen name="StoryDetail" component={StoryDetail} options={{ headerShown: false }} />
                     <Stack.Screen name="Cart" component={Cart} options={{ headerShown: false }} />
                     <Stack.Screen name="Payment" component={Payment} options={{ headerShown: false }} />
+                    <Stack.Screen name="Settings" component={Settings} options={{ headerShown: false }} />
                 </>
             ) : (
                 <>
                     <Stack.Screen name="SignUp" component={SignUp} options={{ headerShown: false }} />
                     <Stack.Screen name="OtpScreen" component={OtpScreen} options={{ headerShown: false }} />
                     <Stack.Screen name="Login" component={Login} options={{ headerShown: false }} />
+                    <Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{ headerShown: false }} />
                 </>
             )}
         </Stack.Navigator>

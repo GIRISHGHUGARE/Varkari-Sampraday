@@ -147,7 +147,9 @@ import { useSelector } from "react-redux";
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5'; // Import FontAwesome for icons
 
 // Replace with your backend URL
-const socket = io("http://ip:8080/");
+// const socket = io("http://172.23.0.214:8080/");
+const socket = io("https://varkari-sampraday.onrender.com");
+
 
 const TrackerScreen = () => {
     const [location, setLocation] = useState(null);

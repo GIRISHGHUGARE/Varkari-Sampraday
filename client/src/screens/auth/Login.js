@@ -196,6 +196,10 @@ const Login = () => {
                                     iconEnd="eye-slash"
                                 />
 
+                                <Text className="color-[#A4A4A4] text-right font-bold font-poppins text-[13px] mt-1 mb-1" onPress={() => navigation.navigate('ForgotPassword')}>
+                                    Forgot Password?
+                                </Text>
+
                                 <Text className="color-[#A4A4A4] text-center mt-4 mb-4 font-poppins">
                                     Don't have an account?{" "}
                                     <Text className="text-red-500 font-bold font-poppins" onPress={() => navigation.navigate('SignUp')}>

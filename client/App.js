@@ -8,8 +8,6 @@ import store from './src/redux/store.js';
 import RootNavigation from './src/navigation/RootNavigation.js';
 import './global.css';
 
-
-
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {

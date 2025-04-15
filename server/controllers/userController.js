@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 // FILES
 const User = require('../models/User');
 const generateToken = require('../utils/generateToken');
-const { sendVerificationEmail, sendResetSuccessEmail } = require('../services/emailService');
+const { sendVerificationEmail, sendResetSuccessEmail, sendVerificationEmailForgotPassword } = require('../services/emailService');
 
 // HANDLING COOKIE FUNCTION
 const cookieOptions = {
@@ -343,8 +343,8 @@ const updateUser = async (req, res) => {
 }
 
 const forgotPassword = async (req, res) => {
-    const userId = req.user;  // DECODED userId WHICH IS PASSED FROM AUTHENTICATE MIDDLEWARE
-    const user = await User.findById(userId);  // FIND EVERYTHING RELATED TO USER
+    const { email } = req.body;  // DECODED userId WHICH IS PASSED FROM AUTHENTICATE MIDDLEWARE
+    const user = await User.findOne({ email });  // FIND EVERYTHING RELATED TO USER
     if (!user) {
         return res.status(404).json({
             success: false,
@@ -356,7 +356,7 @@ const forgotPassword = async (req, res) => {
 
     // Attempt to send the verification email
     try {
-        await sendVerificationEmail({ email: user.email, verificationToken });
+        await sendVerificationEmailForgotPassword({ email: user.email, verificationToken });
     } catch (error) {
         return res.status(500).json({ error: 'Error in sending verification email, please retry after some time!' });
     }
@@ -366,7 +366,7 @@ const forgotPassword = async (req, res) => {
         await user.save();
         return res.status(200).json({
             success: true,
-            message: "Password reset link sent to your email!"
+            message: "Password reset otp sent to your email!"
         });
     } catch (error) {
         console.log("Error in forgotPassword", error);
@@ -377,12 +377,10 @@ const forgotPassword = async (req, res) => {
     }
 };
 
-const resetPassword = async (req, res) => {
+const verifyOtpResetPassword = async (req, res) => {
     try {
-        const { otp } = req.body;
-        const userId = req.user;
-        // Fetch user from database
-        const user = await User.findById(userId);
+        const { email, otp } = req.body;
+        const user = await User.findOne({ email }); // again use findOne
         if (!user) {
             return res.status(404).json({ message: "User  not found" });
         }
@@ -395,7 +393,31 @@ const resetPassword = async (req, res) => {
         user.resetPasswordToken = undefined;
         user.resetPasswordExpiresAt = undefined;
         await user.save();
-        await sendResetSuccessEmail(user.email);
+        return res.status(200).json({
+            success: true,
+            message: "Email verified successfully!"
+        })
+    } catch (error) {
+        console.log("Error in resetPassword", error);
+        res.status(400).json({
+            success: false,
+            message: error.message
+        })
+    }
+};
+
+const resetPassword = async (req, res) => {
+    try {
+        const { email, newPassword } = req.body;
+        const user = await User.findOne({ email }); // again use findOne
+        if (!user) {
+            return res.status(404).json({ message: "User  not found" });
+        }
+        // Hash the password
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        user.password = hashedPassword
+        await user.save();
+        await sendResetSuccessEmail({ email: user.email });
         return res.status(200).json({
             success: true,
             message: "Password reset successfully!"
@@ -408,5 +430,4 @@ const resetPassword = async (req, res) => {
         })
     }
 };
-
-module.exports = { registerUser, verifyEmail, resendVerificationEmail, loginUser, verifyUser, updateUser, searchUser, logout, forgotPassword, resetPassword };
+module.exports = { registerUser, verifyEmail, resendVerificationEmail, loginUser, verifyUser, updateUser, searchUser, logout, forgotPassword, resetPassword, verifyOtpResetPassword };

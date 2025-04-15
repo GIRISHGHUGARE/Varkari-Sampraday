@@ -69,7 +69,7 @@ const deleteStory = async (req, res) => {
             await Story.findByIdAndDelete({ _id: id });
             res.status(201).json({
                 success: true,
-                message: 'Product deleted successfully!'
+                message: 'Story deleted successfully!'
             });
         }
         res.status(500).json({
