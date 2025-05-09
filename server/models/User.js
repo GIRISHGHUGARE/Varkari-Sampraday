@@ -1,16 +1,17 @@
+// PACKAGES
 const mongoose = require('mongoose');
 
-// Define the schema for the user (including admins)
+// SCHEMA DEFINITION
 const userSchema = new mongoose.Schema({
     username: {
         type: String,
         required: true,
-        unique: true,  // Ensure username is unique
+        unique: true,
     },
     email: {
         type: String,
         required: true,
-        unique: true, // Ensure the email is unique
+        unique: true,
         lowercase: true,
         match: [/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, 'Please enter a valid email address'],
     },
@@ -19,31 +20,33 @@ const userSchema = new mongoose.Schema({
         required: true,
     },
     profilePhoto: {
-        type: String, // URL or path to the profile photo
+        type: String, // URL OF PROFILE PHOTO
         default: null,
     },
     summary: {
         type: String,
-        default: '', // Optional field for bio or summary
+        default: '', // OPTIONAL FIELD FOR BIO
     },
     isVerified: {
         type: Boolean,
-        default: false, // User email verification status
+        default: false,
     },
     isAdmin: {
         type: Boolean,
-        default: false, // Flag to indicate if the user is an admin
+        default: false,
     },
     resetPasswordToken: String,
     resetPasswordExpiresAt: Date,
     verificationToken: String,
     verificationTokenExpiresAt: Date,
     otpResendCount: { type: Number, default: 0 },
-    otpResendTimestamp: { type: Date }, // Track the last time OTP was resent
+    otpResendTimestamp: { type: Date }, // Track THE LAST TIME OTP WAS RESENT 
 }, {
-    timestamps: true,  // Automatically adds createdAt and updatedAt fields
+    timestamps: true,  // AUTOMATICALLY ADDS createdAt AND updatedAt FIELDS
 });
 
-// Create and export the User model
+// CREATE USER MODEL
 const User = mongoose.model('User', userSchema);
+
+// EXPORT USER MODEL
 module.exports = User;

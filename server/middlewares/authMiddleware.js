@@ -1,21 +1,18 @@
+//PACKAGES
 const jwt = require('jsonwebtoken');
-const cookieParser = require('cookie-parser');
 
-// Middleware to authenticate the user by verifying the JWT token from cookies
+//MIDDLEWARE TO HANDLE AUTHENTICATION TO VERIFY JWT TOKEN 
 const authenticate = (req, res, next) => {
-    const token = req.cookies.token; // Get the token from cookies (assuming your cookie is named 'token')
-
+    const token = req.headers['authorization']?.split(' ')[1]; // GET THE TOKEN FROM AUTHORIZATION HEADERS
     if (!token) {
-        return res.status(401).json({ msg: 'No token, authorization denied' });
+        return res.status(401).json({ message: 'No token, authorization denied' });
     }
-
     try {
-        // Verify the token
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded.user; // Attach the decoded user info to the request object
-        next(); // Continue to the next middleware or route handler
+        req.user = decoded.user; // NOTE:- userId IS BEING PASSED AHEAD!!  
+        next();
     } catch (err) {
-        return res.status(401).json({ msg: 'Token is not valid' });
+        return res.status(401).json({ message: 'Token is not valid' });
     }
 };
 

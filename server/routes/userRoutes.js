@@ -1,9 +1,14 @@
+// PACKAGES
 const express = require('express');
-const router = express.Router();
-const { registerUser, verifyEmail, logout, loginUser, resendVerificationEmail } = require('../controllers/userController');
-const userValidationRules = require('../validations/userValidation');
 const { validationResult } = require('express-validator');
+
+// FILES
+const { registerUser, verifyEmail, logout, loginUser, resendVerificationEmail, verifyUser, searchUser, updateUser, forgotPassword, resetPassword, verifyOtpResetPassword } = require('../controllers/userController');
+const userValidationRules = require('../validations/userValidation');
 const loginValidationRules = require('../validations/loginValidation');
+const authenticate = require('../middlewares/authMiddleware');
+
+const router = express.Router();
 
 // MIDDLEWARE TO HANDLE ERRORS
 const validate = (req, res, next) => {
@@ -16,9 +21,15 @@ const validate = (req, res, next) => {
 
 // ROUTES
 router.post('/register', userValidationRules, validate, registerUser);
-router.post("/verify-email", verifyEmail);
-router.post("/resend-otp", resendVerificationEmail);
+router.post("/verify-email", authenticate, verifyEmail);
+router.post("/resend-otp", authenticate, resendVerificationEmail);
+router.post("/forgot-password", forgotPassword);
+router.post("/otp-reset-password", verifyOtpResetPassword);
+router.post("/reset-password", resetPassword);
 router.post('/login', loginValidationRules, validate, loginUser);
+router.get('/verify-user', authenticate, verifyUser);
+router.post('/search-user', authenticate, searchUser);
+router.put("/update-user", authenticate, updateUser);
 router.delete("/logout", logout);
 
 module.exports = router;
